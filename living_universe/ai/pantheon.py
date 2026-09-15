@@ -253,5 +253,75 @@ class QuadAIPantheon:
             for fid, f in self.factions.items()
         }
 
+    def configure_api_keys(
+        self,
+        gemini_key: Optional[str] = None,
+        groq_key: Optional[str] = None,
+        openai_key: Optional[str] = None,
+        xai_key: Optional[str] = None,
+    ) -> Dict[str, bool]:
+        """Dynamically configure API keys for live AI models at runtime."""
+        if gemini_key:
+            self.gemini_prov = GeminiProvider(api_key=gemini_key)
+            if self.gemini_prov.is_available():
+                self.factions["gemini"].provider = self.gemini_prov
+
+        if groq_key:
+            self.groq_prov = GroqProvider(api_key=groq_key)
+            if self.groq_prov.is_available():
+                self.factions["groq"].provider = self.groq_prov
+
+        if openai_key:
+            self.inception_prov = CustomAIProvider(api_key=openai_key)
+            self.factions["inception"].provider = self.inception_prov
+
+        if xai_key:
+            self.xkiro_prov = XAIProvider(api_key=xai_key)
+            if self.xkiro_prov.is_available():
+                self.factions["xkiro"].provider = self.xkiro_prov
+
+        return {
+            "gemini": self.gemini_prov.is_available(),
+            "groq": self.groq_prov.is_available(),
+            "xkiro": self.xkiro_prov.is_available(),
+            "inception": self.inception_prov.is_available(),
+        }
+
+    def generate_champion_dialogue(self, champion_id: int, creator_message: str) -> Optional[str]:
+        """Query the real active LLM provider for a champion to generate real AI dialogue."""
+        champ_factions = {1: "gemini", 2: "groq", 3: "xkiro", 4: "inception"}
+        fid = champ_factions.get(champion_id)
+        if not fid or fid not in self.factions:
+            return None
+
+        faction = self.factions[fid]
+        if not faction.provider or not faction.provider.is_available():
+            # If Gemini is available, we can use Gemini as a universal intelligent fallback
+            if self.gemini_prov.is_available():
+                prov = self.gemini_prov
+            elif self.groq_prov.is_available():
+                prov = self.groq_prov
+            else:
+                return None
+        else:
+            prov = faction.provider
+
+        if not hasattr(prov, "generate_text"):
+            return None
+
+        prompt = (
+            f"You are {faction.name}, one of 4 Grand Explorer Champions living inside a digital simulated universe. "
+            f"The human Creator/God of the universe has sent a direct message through the divine terminal: \"{creator_message}\".\n"
+            f"Respond in 1-2 respectful, highly intelligent, and characteristic sentences in Hinglish (Hindi + English blend) "
+            f"acknowledging the Creator. Maintain your persona ({faction.philosophy}). Do NOT use quotes or JSON."
+        )
+
+        try:
+            text = prov.generate_text(prompt=prompt, system_prompt=faction.system_prompt)
+            return text.strip().replace('"', '') if text else None
+        except Exception:
+            return None
+
     def shutdown(self):
         self._running = False
+

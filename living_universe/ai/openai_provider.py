@@ -71,3 +71,23 @@ class OpenAIProvider(AIProvider):
             return AIResponse(provider=self.name, success=True, observation=obs, command=cmd, raw_response=text)
         except Exception as exc:
             return AIResponse(provider=self.name, success=False, error=str(exc), raw_response=text)
+
+    def generate_text(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+        """Generate speech or dialogue via OpenAI GPT models."""
+        if not self.is_available():
+            return ""
+        try:
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": prompt})
+            response = self._client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=250,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception:
+            return ""
+

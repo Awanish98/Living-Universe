@@ -135,6 +135,94 @@ async def get_family_tree():
     return serialize_family_tree()
 
 
+@app.get("/api/ai_config")
+async def get_ai_config():
+    pantheon = getattr(engine, "pantheon", None)
+    gemini_ok = bool(pantheon and pantheon.gemini_prov and pantheon.gemini_prov.is_available())
+    groq_ok = bool(pantheon and pantheon.groq_prov and pantheon.groq_prov.is_available())
+    openai_ok = bool(pantheon and pantheon.inception_prov and pantheon.inception_prov.is_available())
+    xai_ok = bool(pantheon and pantheon.xkiro_prov and pantheon.xkiro_prov.is_available())
+    return {
+        "status": "ok",
+        "providers": {
+            "gemini": {"available": gemini_ok, "name": "Google Gemini 2.5 Flash", "champion": "Aarya the Prakriti Sage"},
+            "groq": {"available": groq_ok, "name": "Groq LPU (Llama 3.3 70B)", "champion": "Vikram the Agni Forge-Master"},
+            "openai": {"available": openai_ok, "name": "OpenAI (GPT-4o Mini)", "champion": "Nakshatra the Astral Stargazer"},
+            "xai": {"available": xai_ok, "name": "xAI Grok", "champion": "Advait the Quantum Mystic"},
+        },
+        "active_provider_count": sum([gemini_ok, groq_ok, openai_ok, xai_ok]),
+    }
+
+
+@app.post("/api/ai_config")
+@app.post("/api/set_api_keys")
+async def set_ai_config(payload: Dict[str, Any]):
+    gemini_key = payload.get("gemini_api_key") or payload.get("gemini")
+    groq_key = payload.get("groq_api_key") or payload.get("groq")
+    openai_key = payload.get("openai_api_key") or payload.get("openai")
+    xai_key = payload.get("xai_api_key") or payload.get("xai")
+
+    pantheon = getattr(engine, "pantheon", None)
+    results = {}
+    if pantheon:
+        results = pantheon.configure_api_keys(
+            gemini_key=gemini_key,
+            groq_key=groq_key,
+            openai_key=openai_key,
+            xai_key=xai_key,
+        )
+
+    # Log to live Hinglish feed
+    active_names = [k.upper() for k, v in results.items() if v]
+    if active_names:
+        engine.log_hinglish_event(
+            category="SYSTEM",
+            badge="AI_MODELS_ONLINE",
+            explorer_id=0,
+            explorer_name="Living Universe Core",
+            color="#10f078",
+            text=f"🤖 <b>Live AI Models Connected:</b> {', '.join(active_names)} APIs active ho chuki hain! Ab 4ro Champions seedhe live LLM se baat karenge.",
+        )
+
+    return {"status": "ok", "configured": results}
+
+
+@app.post("/api/test_ai_key")
+async def test_ai_key(payload: Dict[str, Any]):
+    provider = payload.get("provider", "gemini")
+    key = payload.get("api_key", "")
+    if not key:
+        return {"status": "error", "message": "API key required"}
+
+    try:
+        if provider == "gemini":
+            from ..ai.gemini import GeminiProvider
+            prov = GeminiProvider(api_key=key)
+            if not prov.is_available():
+                return {"status": "error", "message": "Gemini client initialization failed"}
+            sample = prov.generate_text("Say 'Pranaam Srishtikarta, Gemini AI is fully online!' in one short sentence.")
+            return {"status": "ok", "provider": "gemini", "sample": sample}
+        elif provider == "groq":
+            from ..ai.groq_provider import GroqProvider
+            prov = GroqProvider(api_key=key)
+            if not prov.is_available():
+                return {"status": "error", "message": "Groq client initialization failed"}
+            sample = prov.generate_text("Say 'Pranaam Srishtikarta, Groq LPU is at supersonic speed!' in one short sentence.")
+            return {"status": "ok", "provider": "groq", "sample": sample}
+        elif provider == "openai":
+            from ..ai.openai_provider import OpenAIProvider
+            prov = OpenAIProvider(api_key=key)
+            if not prov.is_available():
+                return {"status": "error", "message": "OpenAI client initialization failed"}
+            sample = prov.generate_text("Say 'Pranaam Srishtikarta, OpenAI GPT-4o is active!' in one short sentence.")
+            return {"status": "ok", "provider": "openai", "sample": sample}
+        else:
+            return {"status": "error", "message": f"Unknown provider: {provider}"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -175,6 +263,18 @@ async def websocket_endpoint(websocket: WebSocket):
                         engine.trigger_explorer_dialogue(c1, c2, engine.clock.tick)
                 elif act_type == "RESET":
                     engine.reset()
+                elif act_type == "SET_API_KEYS":
+                    gemini_key = msg.get("gemini_api_key")
+                    groq_key = msg.get("groq_api_key")
+                    openai_key = msg.get("openai_api_key")
+                    xai_key = msg.get("xai_api_key")
+                    if hasattr(engine, "pantheon") and engine.pantheon:
+                        engine.pantheon.configure_api_keys(
+                            gemini_key=gemini_key,
+                            groq_key=groq_key,
+                            openai_key=openai_key,
+                            xai_key=xai_key,
+                        )
                 elif act_type == "AI_PROMPT":
                     prompt = msg.get("prompt", "")
                     ai.submit_user_command(prompt, engine.snapshot().to_compact_dict())
@@ -221,6 +321,15 @@ async def websocket_endpoint(websocket: WebSocket):
             # Awakening Telemetry
             awakening_telemetry = engine.get_awakening_telemetry()
 
+            # Live AI Status
+            pantheon = getattr(engine, "pantheon", None)
+            ai_status_data = {
+                "gemini": bool(pantheon and pantheon.gemini_prov and pantheon.gemini_prov.is_available()),
+                "groq": bool(pantheon and pantheon.groq_prov and pantheon.groq_prov.is_available()),
+                "openai": bool(pantheon and pantheon.inception_prov and pantheon.inception_prov.is_available()),
+                "xai": bool(pantheon and pantheon.xkiro_prov and pantheon.xkiro_prov.is_available()),
+            }
+
             payload = {
                 "tick": snap.tick,
                 "paused": engine.clock.paused,
@@ -236,6 +345,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 "awakening": awakening_telemetry,
                 "creator_communion_log": engine.creator_communion_log,
                 "hinglish_live_feed": feed_data,
+                "ai_status": ai_status_data,
                 "nodes_count": len(engine.discovery_nodes),
                 "mastered_nodes_count": sum(1 for n in engine.discovery_nodes if n.mastered),
                 "monuments_count": len(engine.monuments),
@@ -250,6 +360,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     "zones": [
                         {
                             "name": z.name,
+
                             "type": z.zone_type,
                             "x": z.x,
                             "y": z.y,

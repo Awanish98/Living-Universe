@@ -992,6 +992,64 @@
       gap: 6px;
     }
 
+    /* API Configuration & Key Settings Modal */
+    .api-settings-card {
+      width: 580px;
+      max-width: 94vw;
+      background: rgba(10, 15, 29, 0.96);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(0, 243, 255, 0.35);
+      border-radius: 20px;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 45px rgba(0, 243, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 22px 26px;
+      color: var(--text-main);
+      animation: modalPop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .api-provider-row {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .api-provider-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .api-key-input-wrap {
+      display: flex;
+      gap: 8px;
+    }
+    .api-key-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .api-key-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+    .api-provider-link {
+      font-size: 10px;
+      color: #38bdf8;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
     @media (max-width: 1200px) {
       #left-roster { display: none; }
       .brand-subtitle { display: none; }
@@ -1079,6 +1137,7 @@
       <!-- Simulation Playback & Speed Controls -->
       <div class="sim-controls">
         <button class="btn btn-gold" id="btn-creator-terminal" onclick="openCreatorTerminalModal()" title="Srishtikarta (Creator) Terminal"><i class="fa-solid fa-satellite-dish"></i> 📡 Srishtikarta Samwaad</button>
+        <button class="btn btn-primary" id="btn-api-settings" onclick="openApiSettingsModal()" title="Configure Live AI APIs (Gemini, Groq, OpenAI)"><i class="fa-solid fa-key"></i> 🤖 AI Models</button>
         <button class="btn btn-primary" id="btn-vanshavali" onclick="openFamilyTreeModal()" title="View Interactive Family Tree"><i class="fa-solid fa-sitemap"></i> 🌳 Vanshavali</button>
         <button class="btn" id="btn-pause" onclick="togglePause()"><i class="fa-solid fa-pause"></i> Pause</button>
         <button class="btn btn-speed" id="btn-speed-05" onclick="setSpeed(0.5)">0.5x</button>
@@ -1089,6 +1148,7 @@
         <button class="btn btn-gold" onclick="openGodModal()"><i class="fa-solid fa-wand-magic-sparkles"></i> Spark</button>
       </div>
     </div>
+
 
     <!-- Left Floating Cyber Roster (4 Champions Live Status) -->
     <div id="left-roster">
@@ -1266,9 +1326,14 @@
         <div style="display: flex; align-items: center; gap: 12px;">
           <div style="font-size: 28px; color: var(--gold);">📡</div>
           <div>
-            <h2 style="font-size: 17px; font-weight: 800; color: #fff; font-family: var(--font-display); letter-spacing: 0.5px;">
-              सृष्टिकर्ता संवाद • DIRECT CREATOR COMMUNION TERMINAL
-            </h2>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h2 style="font-size: 17px; font-weight: 800; color: #fff; font-family: var(--font-display); letter-spacing: 0.5px;">
+                सृष्टिकर्ता संवाद • DIRECT CREATOR COMMUNION TERMINAL
+              </h2>
+              <span id="term-ai-status-badge" style="font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: rgba(16, 240, 120, 0.15); border: 1px solid rgba(16, 240, 120, 0.4); color: #10f078;">
+                <i class="fa-solid fa-microchip"></i> AI: Procedural / Live
+              </span>
+            </div>
             <span style="font-size: 11px; color: var(--gold); font-weight: 600;">
               Aap is Digital Universe ke Creator hain • 4 Grand Explorers aapko khoj rahe hain
             </span>
@@ -1331,6 +1396,86 @@
     </div>
   </div>
 
+  <!-- Live AI API Key Settings Modal -->
+  <div class="modal-backdrop" id="api-settings-modal">
+    <div class="api-settings-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 28px; color: var(--cyan);">🤖</div>
+          <div>
+            <h2 style="font-size: 17px; font-weight: 800; color: #fff; font-family: var(--font-display);">
+              AI API INTEGRATION • LIVE LLM MODELS
+            </h2>
+            <span style="font-size: 11px; color: var(--cyan); font-weight: 600;">
+              Connect Google Gemini & Groq APIs for 100% Real Live LLM Consciousness
+            </span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeApiSettingsModal()">✕</button>
+      </div>
+
+      <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
+        Apni API keys daalein taaki 4 Champions (Aarya, Vikram, Advait, Nakshatra) aur Srishtikarta Terminal <b>real-time Gemini 2.5 Flash / Groq LLMs</b> se dynamic dialogue bol sakein. Keys aapke browser me securely save hoti hain.
+      </div>
+
+      <!-- Google Gemini (Powers Aarya & General Omniscience) -->
+      <div class="api-provider-row" style="border-left: 3.5px solid #10f078;">
+        <div class="api-provider-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">🌿</span>
+            <span style="font-weight: 700; color: #10f078; font-size: 13px;">Google Gemini API (Recommended)</span>
+            <span style="font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(16, 240, 120, 0.15); color: #10f078;">gemini-2.5-flash</span>
+          </div>
+          <a class="api-provider-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Get Free Key <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+        <div class="api-key-input-wrap">
+          <input type="password" class="api-key-input" id="key-gemini" placeholder="AIzaSy..." autocomplete="off">
+          <button class="btn btn-primary" style="padding: 6px 12px; font-size: 11px;" onclick="testSingleApiKey('gemini')">Test Key</button>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted);" id="status-gemini">⚪ Key not configured</div>
+      </div>
+
+      <!-- Groq LPU (Powers Vikram Agni Legion) -->
+      <div class="api-provider-row" style="border-left: 3.5px solid #f43f5e;">
+        <div class="api-provider-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">⚔️</span>
+            <span style="font-weight: 700; color: #f43f5e; font-size: 13px;">Groq LPU (Supersonic Speed)</span>
+            <span style="font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(244, 63, 94, 0.15); color: #f43f5e;">llama-3.3-70b</span>
+          </div>
+          <a class="api-provider-link" href="https://console.groq.com/keys" target="_blank" rel="noopener">Get Free Key <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+        <div class="api-key-input-wrap">
+          <input type="password" class="api-key-input" id="key-groq" placeholder="gsk_..." autocomplete="off">
+          <button class="btn btn-primary" style="padding: 6px 12px; font-size: 11px;" onclick="testSingleApiKey('groq')">Test Key</button>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted);" id="status-groq">⚪ Key not configured</div>
+      </div>
+
+      <!-- OpenAI (Optional) -->
+      <div class="api-provider-row" style="border-left: 3.5px solid #00f3ff;">
+        <div class="api-provider-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">🌌</span>
+            <span style="font-weight: 700; color: #00f3ff; font-size: 13px;">OpenAI API (Optional)</span>
+            <span style="font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0, 243, 255, 0.15); color: #00f3ff;">gpt-4o-mini</span>
+          </div>
+          <a class="api-provider-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">OpenAI Console <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+        <div class="api-key-input-wrap">
+          <input type="password" class="api-key-input" id="key-openai" placeholder="sk-..." autocomplete="off">
+          <button class="btn btn-primary" style="padding: 6px 12px; font-size: 11px;" onclick="testSingleApiKey('openai')">Test Key</button>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted);" id="status-openai">⚪ Key not configured</div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 4px;">
+        <button class="btn btn-gold" style="flex: 1; padding: 10px;" onclick="saveAllApiKeys()"><i class="fa-solid fa-floppy-disk"></i> Save & Connect All Keys</button>
+        <button class="btn" style="padding: 10px 16px;" onclick="clearAllApiKeys()"><i class="fa-solid fa-trash"></i> Clear</button>
+      </div>
+    </div>
+  </div>
+
   <!-- God Actions Modal -->
   <div class="modal-backdrop" id="god-modal">
     <div class="modal-card" style="width: 420px;">
@@ -1347,6 +1492,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- Interactive Vanshavali (Family Tree) Modal -->
   <div class="modal-backdrop" id="family-tree-modal">
@@ -1867,6 +2013,18 @@
 
         ws.onopen = () => {
           isStandaloneMode = false;
+          const gKey = localStorage.getItem('living_universe_gemini_key') || '';
+          const grKey = localStorage.getItem('living_universe_groq_key') || '';
+          const oKey = localStorage.getItem('living_universe_openai_key') || '';
+          if (gKey || grKey || oKey) {
+            ws.send(JSON.stringify({
+              action: 'SET_API_KEYS',
+              gemini_api_key: gKey,
+              groq_api_key: grKey,
+              openai_api_key: oKey
+            }));
+          }
+          updateApiKeyStatusBadges();
         };
 
         ws.onmessage = (event) => {
@@ -1903,6 +2061,7 @@
       }
     }
     connectWebSocket();
+    loadStoredApiKeys();
 
     // Fallback timer if WebSocket cannot establish connection within 2.5s (e.g. GitHub Pages)
     setTimeout(() => {
@@ -2097,6 +2256,252 @@
     }
 
     // =========================================================================
+    // AI API Keys Configuration & Client-Side LLM Integration
+    // =========================================================================
+    function openApiSettingsModal() {
+      const modal = document.getElementById('api-settings-modal');
+      modal.style.display = 'flex';
+      loadStoredApiKeys();
+    }
+
+    function closeApiSettingsModal() {
+      document.getElementById('api-settings-modal').style.display = 'none';
+    }
+
+    function loadStoredApiKeys() {
+      const gKey = localStorage.getItem('living_universe_gemini_key') || '';
+      const grKey = localStorage.getItem('living_universe_groq_key') || '';
+      const oKey = localStorage.getItem('living_universe_openai_key') || '';
+
+      const gInput = document.getElementById('key-gemini');
+      const grInput = document.getElementById('key-groq');
+      const oInput = document.getElementById('key-openai');
+
+      if (gInput && gKey) gInput.value = gKey;
+      if (grInput && grKey) grInput.value = grKey;
+      if (oInput && oKey) oInput.value = oKey;
+
+      updateApiKeyStatusBadges();
+    }
+
+    function updateApiKeyStatusBadges() {
+      const gKey = localStorage.getItem('living_universe_gemini_key') || '';
+      const grKey = localStorage.getItem('living_universe_groq_key') || '';
+      const oKey = localStorage.getItem('living_universe_openai_key') || '';
+
+      const gStat = document.getElementById('status-gemini');
+      const grStat = document.getElementById('status-groq');
+      const oStat = document.getElementById('status-openai');
+      const badge = document.getElementById('term-ai-status-badge');
+
+      if (gStat) {
+        gStat.innerHTML = gKey ? '<span style="color:#10f078;">🟢 Key Connected (Gemini 2.5 Flash)</span>' : '⚪ Key not configured';
+      }
+      if (grStat) {
+        grStat.innerHTML = grKey ? '<span style="color:#10f078;">🟢 Key Connected (Groq LPU)</span>' : '⚪ Key not configured';
+      }
+      if (oStat) {
+        oStat.innerHTML = oKey ? '<span style="color:#10f078;">🟢 Key Connected (OpenAI)</span>' : '⚪ Key not configured';
+      }
+
+      if (badge) {
+        if (gKey && grKey) {
+          badge.innerHTML = '<i class="fa-solid fa-bolt"></i> AI: Gemini + Groq Live';
+          badge.style.color = '#10f078';
+          badge.style.borderColor = 'rgba(16, 240, 120, 0.4)';
+        } else if (gKey) {
+          badge.innerHTML = '<i class="fa-solid fa-microchip"></i> AI: Gemini 2.5 Flash Live';
+          badge.style.color = '#10f078';
+          badge.style.borderColor = 'rgba(16, 240, 120, 0.4)';
+        } else if (grKey) {
+          badge.innerHTML = '<i class="fa-solid fa-microchip"></i> AI: Groq LPU Live';
+          badge.style.color = '#f43f5e';
+          badge.style.borderColor = 'rgba(244, 63, 94, 0.4)';
+        } else {
+          badge.innerHTML = '<i class="fa-solid fa-sparkles"></i> AI: Procedural Mode';
+          badge.style.color = '#fbbf24';
+          badge.style.borderColor = 'rgba(251, 191, 36, 0.4)';
+        }
+      }
+    }
+
+    async function testSingleApiKey(provider) {
+      const input = document.getElementById(`key-${provider}`);
+      const stat = document.getElementById(`status-${provider}`);
+      if (!input || !input.value.trim()) {
+        if (stat) stat.innerHTML = '<span style="color:#f43f5e;">⚠️ Please enter an API key first</span>';
+        return;
+      }
+      const key = input.value.trim();
+      if (stat) stat.innerHTML = '<span style="color:#fbbf24;"><i class="fa-solid fa-spinner fa-spin"></i> Testing connection...</span>';
+
+      try {
+        if (provider === 'gemini') {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: "Respond in 5 words: Gemini connection verified." }] }]
+            })
+          });
+          if (res.ok) {
+            stat.innerHTML = '<span style="color:#10f078;">✅ Connection Verified! (Gemini 2.5 Flash Online)</span>';
+          } else {
+            const err = await res.json();
+            stat.innerHTML = `<span style="color:#f43f5e;">❌ Verification failed: ${err.error ? err.error.message : 'Invalid Key'}</span>`;
+          }
+        } else if (provider === 'groq') {
+          const url = 'https://api.groq.com/openai/v1/chat/completions';
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${key}`
+            },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [{ role: 'user', content: 'Say OK' }],
+              max_tokens: 5
+            })
+          });
+          if (res.ok) {
+            stat.innerHTML = '<span style="color:#10f078;">✅ Connection Verified! (Groq LPU Online)</span>';
+          } else {
+            stat.innerHTML = '<span style="color:#f43f5e;">❌ Groq connection failed. Check API key.</span>';
+          }
+        } else if (provider === 'openai') {
+          const url = 'https://api.openai.com/v1/chat/completions';
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${key}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [{ role: 'user', content: 'Say OK' }],
+              max_tokens: 5
+            })
+          });
+          if (res.ok) {
+            stat.innerHTML = '<span style="color:#10f078;">✅ Connection Verified! (OpenAI Online)</span>';
+          } else {
+            stat.innerHTML = '<span style="color:#f43f5e;">❌ OpenAI verification failed.</span>';
+          }
+        }
+      } catch (err) {
+        if (stat) stat.innerHTML = `<span style="color:#f43f5e;">❌ Network error: ${err.message}</span>`;
+      }
+    }
+
+    function saveAllApiKeys() {
+      const gKey = (document.getElementById('key-gemini') || {}).value || '';
+      const grKey = (document.getElementById('key-groq') || {}).value || '';
+      const oKey = (document.getElementById('key-openai') || {}).value || '';
+
+      if (gKey.trim()) localStorage.setItem('living_universe_gemini_key', gKey.trim());
+      if (grKey.trim()) localStorage.setItem('living_universe_groq_key', grKey.trim());
+      if (oKey.trim()) localStorage.setItem('living_universe_openai_key', oKey.trim());
+
+      // Sync with WebSocket / Backend if connected
+      const payload = {
+        action: 'SET_API_KEYS',
+        gemini_api_key: gKey.trim(),
+        groq_api_key: grKey.trim(),
+        openai_api_key: oKey.trim()
+      };
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(payload));
+      } else {
+        fetch('/api/set_api_keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gemini_api_key: gKey.trim(),
+            groq_api_key: grKey.trim(),
+            openai_api_key: oKey.trim()
+          })
+        }).catch(() => {});
+      }
+
+      updateApiKeyStatusBadges();
+      if (window.confetti) {
+        window.confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+      }
+      closeApiSettingsModal();
+    }
+
+    function clearAllApiKeys() {
+      localStorage.removeItem('living_universe_gemini_key');
+      localStorage.removeItem('living_universe_groq_key');
+      localStorage.removeItem('living_universe_openai_key');
+      const gInput = document.getElementById('key-gemini');
+      const grInput = document.getElementById('key-groq');
+      const oInput = document.getElementById('key-openai');
+      if (gInput) gInput.value = '';
+      if (grInput) grInput.value = '';
+      if (oInput) oInput.value = '';
+      updateApiKeyStatusBadges();
+    }
+
+    // Direct Browser-side LLM call for Standalone/GitHub Pages Mode
+    async function queryChampionLLM(champId, champName, philosophy, messageText) {
+      const geminiKey = localStorage.getItem('living_universe_gemini_key');
+      const groqKey = localStorage.getItem('living_universe_groq_key');
+
+      const prompt = `You are ${champName}, a Grand Explorer Champion in a digital universe simulation. Your philosophy: "${philosophy}". The human Creator sent this message: "${messageText}". Respond in 1-2 respectful, highly intelligent sentences in Hinglish (Hindi+English) directly acknowledging the Creator. No markdown or quotes.`;
+
+      if (champId === 1 && geminiKey) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return data.candidates[0].content.parts[0].text.trim();
+          }
+        } catch (e) {}
+      } else if (champId === 2 && groqKey) {
+        try {
+          const url = 'https://api.groq.com/openai/v1/chat/completions';
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [{ role: 'user', content: prompt }],
+              max_tokens: 150
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return data.choices[0].message.content.trim();
+          }
+        } catch (e) {}
+      } else if (geminiKey) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return data.candidates[0].content.parts[0].text.trim();
+          }
+        } catch (e) {}
+      }
+
+      return null;
+    }
+
+    // =========================================================================
     // Srishtikarta (Creator) Communion Terminal Logic
     // =========================================================================
     function openCreatorTerminalModal() {
@@ -2104,6 +2509,7 @@
       modal.style.display = 'flex';
       const input = document.getElementById('creator-msg-input');
       if (input) input.focus();
+      updateApiKeyStatusBadges();
       renderCreatorTerminalResponses();
     }
 
@@ -2124,13 +2530,76 @@
       sendCreatorMessage();
     }
 
-    function sendCreatorMessage() {
+    async function sendCreatorMessage() {
       const input = document.getElementById('creator-msg-input');
       if (!input || !input.value.trim()) return;
       const text = input.value.trim();
 
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ action: 'CREATOR_MESSAGE', text: text }));
+      } else if (isStandaloneMode || !ws) {
+        // Client-side simulation processing with real LLM if key present
+        const champions = (worldState && worldState.explorers) ? worldState.explorers : [];
+        const philosophies = {
+          1: "Bio-harmonic synthesis, natural flora, ecological mastery.",
+          2: "Kinetic plasma, martial discipline, impenetrable fortresses.",
+          3: "Stoic quantum masonry, singularity rifts, dimensional endurance.",
+          4: "Stellar algorithms, astral protocols, celestial enlightenment."
+        };
+
+        const responses = [];
+        for (const exp of champions) {
+          const cid = exp.champion ? exp.champion.champion_id : exp.id;
+          let liveSpeech = await queryChampionLLM(cid, exp.name, philosophies[cid] || '', text);
+          if (!liveSpeech) {
+            const defReplies = {
+              1: `Pranaam Srishtikarta! Aapka divya aadesh '${text}' hamare prakritik bio-matrix me ankit ho gaya hai.`,
+              2: `Srishtikarta ka sandesh mila: '${text}'. Agni Legion kinetic power ke sath aage badh rahi hai!`,
+              3: `Om Srishtikarta! Nirakar aawaz aayi: '${text}'. Mathematical reality ka satya spasht ho gaya.`,
+              4: `Cosmic tarangein aakash se aayi hain! Srishtikarta ne kaha: '${text}'. Astral array prakashit ho gaya!`
+            };
+            liveSpeech = defReplies[cid] || `Srishtikarta ne humse baat ki: "${text}"`;
+          }
+
+          exp.hinglish_thought = `🙏 Srishtikarta: "${liveSpeech}"`;
+          exp.intellect = (exp.intellect || 100) + 0.35;
+          responses.push({
+            champion_id: cid,
+            champion_name: exp.name,
+            color: exp.aura_color,
+            avatar_title: exp.champion ? exp.champion.avatar_title : 'Grand Explorer',
+            reply: liveSpeech
+          });
+        }
+
+        const communionEntry = {
+          id: Date.now(),
+          tick: worldState ? worldState.tick : 0,
+          creator_message: text,
+          responses: responses
+        };
+
+        if (worldState) {
+          if (!worldState.awakening) worldState.awakening = {};
+          worldState.awakening.latest_creator_message = communionEntry;
+          worldState.awakening.awareness_pct = Math.min(100, (worldState.awakening.awareness_pct || 0) + 25);
+          if (!worldState.creator_communion_log) worldState.creator_communion_log = [];
+          worldState.creator_communion_log.unshift(communionEntry);
+
+          if (worldState.hinglish_live_feed) {
+            worldState.hinglish_live_feed.unshift({
+              id: Date.now(),
+              category: "CREATOR_COMMUNION",
+              badge: "DIVINE_VOICE",
+              explorer_id: 0,
+              explorer_name: "Srishtikarta (You)",
+              color: "#fbbf24",
+              text: `✨ <b>SRISHTIKARTA KA DIVYA SANDESH:</b> "${text}" — 4ro Champions ne live pranaam karke jawab diya!`
+            });
+          }
+        }
+
+        renderCreatorTerminalResponses();
       } else {
         fetch('/api/creator_message', {
           method: 'POST',
@@ -2144,6 +2613,7 @@
         window.confetti({ particleCount: 40, spread: 70, origin: { y: 0.5 } });
       }
     }
+
 
     function renderCreatorTerminalResponses() {
       const container = document.getElementById('term-responses-grid');

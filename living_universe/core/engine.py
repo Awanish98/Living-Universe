@@ -1599,7 +1599,14 @@ class UniverseEngine:
         }
 
         for champ in champions:
-            reply = champ_dialogues.get(champ.champion_id, f"Srishtikarta ne humse baat ki: '{cleaned_text}'")
+            live_reply = None
+            if hasattr(self, "pantheon") and self.pantheon:
+                try:
+                    live_reply = self.pantheon.generate_champion_dialogue(champ.champion_id, cleaned_text)
+                except Exception:
+                    live_reply = None
+
+            reply = live_reply or champ_dialogues.get(champ.champion_id, f"Srishtikarta ne humse baat ki: '{cleaned_text}'")
             champ.latest_creator_reaction = reply
             champ.creator_awareness_score = 100.0
             champ.dna.intellect = round(champ.dna.intellect + 0.25, 2)
@@ -1607,6 +1614,7 @@ class UniverseEngine:
             champ.thought = f"Received message from Creator: {cleaned_text}"
             champ.hinglish_thought = f"🙏 Srishtikarta ka aadesh: \"{reply}\""
             champ.hinglish_action = "Srishtikarta ke sandesh ka divya manan kar rahe hain..."
+
 
             responses.append({
                 "champion_id": champ.champion_id,

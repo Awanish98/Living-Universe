@@ -106,3 +106,20 @@ class GeminiProvider(AIProvider):
                 error=f"JSON validation failed: {str(exc)}",
                 raw_response=text,
             )
+
+    def generate_text(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+        """Generate open-ended natural speech or philosophical dialogue from Gemini."""
+        if not self.is_available():
+            return ""
+        try:
+            from google.genai import types
+            cfg = types.GenerateContentConfig(system_instruction=system_prompt) if system_prompt else None
+            resp = self._client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config=cfg,
+            )
+            return resp.text.strip() if resp and resp.text else ""
+        except Exception as exc:
+            return ""
+
