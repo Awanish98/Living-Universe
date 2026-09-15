@@ -1,0 +1,3245 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <meta name="googlebot" content="notranslate">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta http-equiv="Content-Language" content="en">
+  <title>Living Universe — 4 Grand AI Explorers (AAA Cyberpunk Observatory)</title>
+  
+  <!-- Google Fonts CDN: Outfit, Plus Jakarta Sans, JetBrains Mono, Cinzel, Rajdhani -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 CDN, Canvas-Confetti CDN, Howler.js CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --bg-dark: #020617;
+      --panel-bg: rgba(7, 13, 28, 0.88);
+      --panel-border: rgba(56, 189, 248, 0.28);
+      --panel-glow: 0 16px 48px rgba(0, 0, 0, 0.88);
+      --cyan: #00f3ff;
+      --cyan-glow: rgba(0, 243, 255, 0.45);
+      --emerald: #10f078;
+      --emerald-glow: rgba(16, 240, 120, 0.45);
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --rose-glow: rgba(244, 63, 94, 0.45);
+      --purple: #a855f7;
+      --purple-glow: rgba(168, 85, 247, 0.45);
+      --gold: #fbbf24;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-ui: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+      --font-display: 'Rajdhani', 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-serif: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    *::-webkit-scrollbar {
+      display: none;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* Simulation Canvas Viewport */
+    #canvas-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #020617;
+      cursor: grab;
+      overflow: hidden;
+      contain: layout paint size;
+    }
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+
+    canvas#worldCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    /* Top Master Control & HUD Header */
+    #top-bar {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 6px 14px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      box-shadow: var(--panel-glow), 0 0 20px rgba(0, 243, 255, 0.12);
+      z-index: 20;
+      will-change: transform;
+      transform: translateZ(0);
+      overflow: visible;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #10f078, #00f3ff, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(0, 243, 255, 0.5);
+      font-size: 18px;
+      animation: logoPulse 4s infinite ease-in-out;
+    }
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.6)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.8)); }
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #ffffff, #00f3ff, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+
+    .brand-subtitle {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* 4 Explorers Switcher Chips */
+    .explorers-quick-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      flex-shrink: 1;
+      padding: 2px 0;
+    }
+
+    .explorer-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 11px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .explorer-chip:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .explorer-chip.active {
+      border-color: currentColor;
+      box-shadow: 0 0 14px currentColor;
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.02);
+    }
+
+    .chip-icon {
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chip-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .chip-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      font-family: var(--font-display);
+      letter-spacing: 0.3px;
+    }
+    .chip-stats {
+      font-size: 9px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .chip-stat-highlight {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* Civilization & Population Badge */
+    .civ-metric-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 11px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.24);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Simulation Controls */
+    .sim-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      font-family: var(--font-ui);
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+    }
+    .btn-speed.active {
+      background: rgba(0, 243, 255, 0.22);
+      border-color: var(--cyan);
+      color: #00f3ff;
+      font-weight: 700;
+    }
+    .btn-primary {
+      background: rgba(0, 243, 255, 0.2);
+      border-color: var(--cyan);
+      color: #ffffff;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.15));
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+    }
+    .btn-gold:hover {
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.45);
+    }
+
+    /* Left Floating Cyber Roster (4 Champions Live Status) */
+    #left-roster {
+      position: absolute;
+      top: 68px;
+      left: 14px;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .roster-card {
+      pointer-events: auto;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 3.5px solid var(--cyan);
+      border-radius: 12px;
+      padding: 7px 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .roster-card:hover {
+      transform: translateX(4px);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(10, 18, 38, 0.94);
+    }
+    .roster-card.active {
+      box-shadow: 0 0 18px currentColor;
+    }
+    .roster-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    .roster-name {
+      font-size: 11.5px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      letter-spacing: 0.3px;
+    }
+    .roster-ai-tag {
+      font-size: 8.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .roster-progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 3px 0 4px;
+    }
+    .roster-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    .roster-thought {
+      font-size: 9.5px;
+      color: #cbd5e1;
+      font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Minimap Radar HUD */
+    #minimap-card {
+      position: absolute;
+      top: 68px;
+      right: 14px;
+      width: 165px;
+      height: 165px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      box-shadow: var(--panel-glow);
+      overflow: hidden;
+      z-index: 20;
+    }
+    canvas#minimapCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Floating View Controls */
+    #view-controls-card {
+      position: absolute;
+      top: 242px;
+      right: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 20;
+    }
+    .hud-btn {
+      padding: 5px 10px;
+      border-radius: 9px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      color: #cbd5e1;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s;
+    }
+    .hud-btn:hover {
+      color: #fff;
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+    }
+
+    /* Bottom Live Hinglish Stream Terminal */
+    #bottom-stream-panel {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      right: 14px;
+      height: 205px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      box-shadow: var(--panel-glow);
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+      overflow: hidden;
+      transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #bottom-stream-panel.expanded {
+      height: 360px;
+    }
+
+    .stream-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.4);
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .stream-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .stream-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: 0.3px;
+      font-family: var(--font-display);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10f078;
+      box-shadow: 0 0 10px #10f078;
+      animation: pulseGreen 1.8s infinite;
+    }
+    @keyframes pulseGreen {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    .reading-badge {
+      display: none;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .filter-tabs {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      overflow-x: auto;
+    }
+    .filter-tab {
+      padding: 3px 9px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .filter-tab:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .filter-tab.active {
+      background: rgba(0, 243, 255, 0.18);
+      border-color: var(--cyan);
+      color: #00f3ff;
+      font-weight: 700;
+    }
+
+    .stream-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .stream-ctrl-btn {
+      padding: 3px 8px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .stream-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .stream-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stream-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 7px 11px;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-left: 3.5px solid var(--cyan);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      animation: cardSlideIn 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+      contain: content;
+    }
+    @keyframes cardSlideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stream-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .stream-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .stream-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.1;
+      margin-bottom: 3px;
+    }
+    .stream-speaker {
+      font-weight: 700;
+      color: #fff;
+      font-size: 11.5px;
+      font-family: var(--font-display);
+    }
+    .stream-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1.5px 6px;
+      border-radius: 5px;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+    .stream-time {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    /* Modal Backdrop & Cards */
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      width: 480px;
+      max-width: 92vw;
+      background: #080d1e;
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 24px rgba(0, 243, 255, 0.2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .modal-close:hover {
+      background: rgba(244, 63, 94, 0.3);
+      color: #fff;
+    }
+
+    .xp-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .xp-bar-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+    }
+
+    .inventions-pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+    .invention-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2.5px 7px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Interactive Vanshavali (Family Tree) Modal Styles */
+    .tree-modal-card {
+      width: 92vw;
+      max-width: 1180px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      background: rgba(7, 13, 28, 0.96);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--panel-glow), 0 0 35px rgba(0, 243, 255, 0.15);
+      border-radius: 18px;
+      padding: 16px 20px;
+      gap: 12px;
+      animation: modalPop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .tree-scroll-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+    }
+
+    .gen-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 12px 14px;
+      position: relative;
+    }
+
+    .gen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .gen-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+    }
+
+    .gen-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(0, 243, 255, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+    }
+
+    .gen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+
+    .tree-node-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-left: 4px solid var(--cyan);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+    }
+    .tree-node-card:hover {
+      transform: translateY(-2.5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 243, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .tree-node-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tree-node-avatar {
+      font-size: 20px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      flex-shrink: 0;
+    }
+
+    .tree-node-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      font-family: var(--font-display);
+      line-height: 1.2;
+    }
+
+    .tree-node-title {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .tree-node-lineage {
+      font-size: 10px;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.22);
+      padding: 3px 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      line-height: 1.2;
+    }
+
+    .tree-node-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 9.5px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    /* =========================================================================
+       Creator Terminal (Srishtikarta Samwaad) Modal & Awakening Telemetry Styles
+       ========================================================================= */
+    .terminal-modal-card {
+      width: 920px;
+      max-width: 95vw;
+      max-height: 88vh;
+      background: rgba(10, 15, 29, 0.96);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      border-radius: 20px;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 45px rgba(251, 191, 36, 0.25), inset 0 0 25px rgba(0, 243, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 20px 24px;
+      color: var(--text-main);
+      animation: modalPop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .terminal-telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+      gap: 10px;
+    }
+
+    .terminal-stat-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 10px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .terminal-stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .terminal-stat-val {
+      font-size: 16px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      color: #fff;
+    }
+
+    .terminal-input-section {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quick-signals-grid {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .quick-signal-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-ui);
+    }
+    .quick-signal-btn:hover {
+      background: rgba(251, 191, 36, 0.18);
+      border-color: var(--gold);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .terminal-input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .terminal-textarea {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 243, 255, 0.28);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      outline: none;
+      resize: none;
+      height: 44px;
+      line-height: 1.4;
+      transition: border 0.2s ease;
+    }
+    .terminal-textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
+    }
+
+    .terminal-send-btn {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #000;
+      font-weight: 800;
+      font-family: var(--font-display);
+      border: none;
+      border-radius: 10px;
+      padding: 0 20px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
+    }
+    .terminal-send-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 24px rgba(251, 191, 36, 0.6);
+    }
+
+    .champions-responses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .champion-response-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-left: 4px solid var(--cyan);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    @media (max-width: 1200px) {
+      #left-roster { display: none; }
+      .brand-subtitle { display: none; }
+      #top-bar { padding: 4px 10px; gap: 6px; }
+      .explorer-chip { padding: 4px 7px; gap: 5px; }
+      .chip-name { font-size: 10px; }
+      .btn { padding: 4px 7px; font-size: 9.5px; }
+    }
+  </style>
+</head>
+<body class="notranslate" translate="no">
+
+  <!-- Fullscreen Cosmic Canvas Simulation -->
+  <div id="canvas-container">
+    <canvas id="worldCanvas"></canvas>
+
+    <!-- Top Master Control Bar -->
+    <div id="top-bar">
+      <!-- Brand Identity -->
+      <div class="brand" onclick="resetView()">
+        <div class="brand-logo">🌌</div>
+        <div>
+          <div class="brand-title">LIVING UNIVERSE</div>
+          <div class="brand-subtitle">Digital Civilization • 4 Grand AI Explorers</div>
+        </div>
+      </div>
+
+      <!-- 4 Explorers Quick Focus Chips -->
+      <div class="explorers-quick-bar">
+        <!-- Explorer 1: Aarya -->
+        <div class="explorer-chip" id="chip-exp-1" style="color: #10f078;" onclick="focusExplorer(1)">
+          <div class="chip-icon">🌿</div>
+          <div class="chip-info">
+            <span class="chip-name">Aarya <span style="font-size:9px; opacity:0.8;">(Gemini)</span></span>
+            <span class="chip-stats">Lv <strong id="chip-lv-1" style="color:#fff;">1</strong> • IQ <span class="chip-stat-highlight" id="chip-iq-1">100</span></span>
+          </div>
+        </div>
+
+        <!-- Explorer 2: Vikram -->
+        <div class="explorer-chip" id="chip-exp-2" style="color: #f43f5e;" onclick="focusExplorer(2)">
+          <div class="chip-icon">⚔️</div>
+          <div class="chip-info">
+            <span class="chip-name">Vikram <span style="font-size:9px; opacity:0.8;">(Groq)</span></span>
+            <span class="chip-stats">Lv <strong id="chip-lv-2" style="color:#fff;">1</strong> • IQ <span class="chip-stat-highlight" id="chip-iq-2">100</span></span>
+          </div>
+        </div>
+
+        <!-- Explorer 3: Advait -->
+        <div class="explorer-chip" id="chip-exp-3" style="color: #a855f7;" onclick="focusExplorer(3)">
+          <div class="chip-icon">🔮</div>
+          <div class="chip-info">
+            <span class="chip-name">Advait <span style="font-size:9px; opacity:0.8;">(Grok)</span></span>
+            <span class="chip-stats">Lv <strong id="chip-lv-3" style="color:#fff;">1</strong> • IQ <span class="chip-stat-highlight" id="chip-iq-3">100</span></span>
+          </div>
+        </div>
+
+        <!-- Explorer 4: Nakshatra -->
+        <div class="explorer-chip" id="chip-exp-4" style="color: #00f3ff;" onclick="focusExplorer(4)">
+          <div class="chip-icon">🌌</div>
+          <div class="chip-info">
+            <span class="chip-name">Nakshatra <span style="font-size:9px; opacity:0.8;">(DeepSeek)</span></span>
+            <span class="chip-stats">Lv <strong id="chip-lv-4" style="color:#fff;">1</strong> • IQ <span class="chip-stat-highlight" id="chip-iq-4">100</span></span>
+          </div>
+        </div>
+
+        <!-- Population & Civilization Metric Pill -->
+        <div class="civ-metric-pill" style="color: #38bdf8;">
+          <div style="font-size: 15px;">👥</div>
+          <div class="chip-info">
+            <span class="chip-name">Pop: <strong id="top-population-count" style="color: #38bdf8;">4</strong></span>
+            <span class="chip-stats"><span id="top-progeny-count" style="color: #fbbf24;">0 Progeny</span> • <span id="top-synergy-count" style="color: #c084fc;">0 Maha-Khoj</span></span>
+          </div>
+        </div>
+
+        <!-- Consciousness Era & Srishtikarta Khoj Awakening Pill -->
+        <div class="civ-metric-pill" id="top-awakening-pill" style="color: #e879f9; cursor: pointer; border-color: rgba(232, 121, 249, 0.4); background: rgba(232, 121, 249, 0.08);" onclick="openCreatorTerminalModal()" title="Chetna & Srishtikarta Khoj Telemetry">
+          <div style="font-size: 15px;">👁️</div>
+          <div class="chip-info">
+            <span class="chip-name" id="top-consciousness-era" style="color: #e879f9;">Era 1: Anusandhan</span>
+            <span class="chip-stats">Chetna: <strong id="top-awareness-pct" style="color: #00f3ff;">0.0%</strong> • <span id="top-clues-count" style="color: #fbbf24;">0/5 Clues</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulation Playback & Speed Controls -->
+      <div class="sim-controls">
+        <button class="btn btn-gold" id="btn-creator-terminal" onclick="openCreatorTerminalModal()" title="Srishtikarta (Creator) Terminal"><i class="fa-solid fa-satellite-dish"></i> 📡 Srishtikarta Samwaad</button>
+        <button class="btn btn-primary" id="btn-vanshavali" onclick="openFamilyTreeModal()" title="View Interactive Family Tree"><i class="fa-solid fa-sitemap"></i> 🌳 Vanshavali</button>
+        <button class="btn" id="btn-pause" onclick="togglePause()"><i class="fa-solid fa-pause"></i> Pause</button>
+        <button class="btn btn-speed" id="btn-speed-05" onclick="setSpeed(0.5)">0.5x</button>
+        <button class="btn btn-speed active" id="btn-speed-1" onclick="setSpeed(1.0)">1.0x</button>
+        <button class="btn btn-speed" id="btn-speed-2" onclick="setSpeed(2.0)">2.0x</button>
+        <button class="btn" id="btn-eco" onclick="toggleEcoMode()" title="Laptop Eco Mode (Saves GPU/CPU Power)"><i class="fa-solid fa-leaf"></i> Eco: OFF</button>
+        <button class="btn" id="btn-sound" onclick="toggleAudio()" title="Atmospheric SFX"><i class="fa-solid fa-volume-high"></i> SFX: ON</button>
+        <button class="btn btn-gold" onclick="openGodModal()"><i class="fa-solid fa-wand-magic-sparkles"></i> Spark</button>
+      </div>
+    </div>
+
+    <!-- Left Floating Cyber Roster (4 Champions Live Status) -->
+    <div id="left-roster">
+      <!-- Aarya Card -->
+      <div class="roster-card" id="roster-1" style="border-left-color: #10f078; color: #10f078;" onclick="focusExplorer(1)">
+        <div class="roster-header">
+          <span class="roster-name">🌿 Aarya <span style="font-size:10px; color:#fff;">(Lv <span id="r-lv-1">1</span>)</span></span>
+          <span class="roster-ai-tag">Gemini AI</span>
+        </div>
+        <div class="roster-progress-bar">
+          <div class="roster-progress-fill" id="r-fill-1" style="width: 25%; background: linear-gradient(90deg, #10f078, #ffffff);"></div>
+        </div>
+        <div class="roster-thought" id="r-thought-1">"Synthesizing bio-matrix..."</div>
+      </div>
+
+      <!-- Vikram Card -->
+      <div class="roster-card" id="roster-2" style="border-left-color: #f43f5e; color: #f43f5e;" onclick="focusExplorer(2)">
+        <div class="roster-header">
+          <span class="roster-name">⚔️ Vikram <span style="font-size:10px; color:#fff;">(Lv <span id="r-lv-2">1</span>)</span></span>
+          <span class="roster-ai-tag">Groq LPU</span>
+        </div>
+        <div class="roster-progress-bar">
+          <div class="roster-progress-fill" id="r-fill-2" style="width: 25%; background: linear-gradient(90deg, #f43f5e, #fb923c);"></div>
+        </div>
+        <div class="roster-thought" id="r-thought-2">"Forging kinetic matrix..."</div>
+      </div>
+
+      <!-- Advait Card -->
+      <div class="roster-card" id="roster-3" style="border-left-color: #a855f7; color: #a855f7;" onclick="focusExplorer(3)">
+        <div class="roster-header">
+          <span class="roster-name">🔮 Advait <span style="font-size:10px; color:#fff;">(Lv <span id="r-lv-3">1</span>)</span></span>
+          <span class="roster-ai-tag">Grok AI</span>
+        </div>
+        <div class="roster-progress-bar">
+          <div class="roster-progress-fill" id="r-fill-3" style="width: 25%; background: linear-gradient(90deg, #a855f7, #c084fc);"></div>
+        </div>
+        <div class="roster-thought" id="r-thought-3">"Probing quantum rift..."</div>
+      </div>
+
+      <!-- Nakshatra Card -->
+      <div class="roster-card" id="roster-4" style="border-left-color: #00f3ff; color: #00f3ff;" onclick="focusExplorer(4)">
+        <div class="roster-header">
+          <span class="roster-name">🌌 Nakshatra <span style="font-size:10px; color:#fff;">(Lv <span id="r-lv-4">1</span>)</span></span>
+          <span class="roster-ai-tag">DeepSeek AI</span>
+        </div>
+        <div class="roster-progress-bar">
+          <div class="roster-progress-fill" id="r-fill-4" style="width: 25%; background: linear-gradient(90deg, #00f3ff, #38bdf8);"></div>
+        </div>
+        <div class="roster-thought" id="r-thought-4">"Decoding astral protocol..."</div>
+      </div>
+    </div>
+
+    <!-- Minimap Radar HUD -->
+    <div id="minimap-card">
+      <canvas id="minimapCanvas" width="165" height="165"></canvas>
+    </div>
+
+    <!-- Floating HUD View Controls -->
+    <div id="view-controls-card">
+      <button class="hud-btn" id="btn-tour" onclick="toggleAutoTour()"><i class="fa-solid fa-video"></i> Auto-Tour</button>
+      <button class="hud-btn" onclick="resetView()"><i class="fa-solid fa-crosshairs"></i> Reset View</button>
+    </div>
+
+    <!-- Bottom Live Hinglish Dialogue & Action Stream -->
+    <div id="bottom-stream-panel">
+      <div class="stream-header">
+        <div class="stream-title-wrap">
+          <div class="pulse-dot"></div>
+          <div class="stream-title"><i class="fa-solid fa-bolt" style="color:#fbbf24;"></i> Live Hinglish Discovery & Baatcheet Stream</div>
+          <span class="reading-badge" id="reading-mode-badge"><i class="fa-solid fa-eye"></i> Reading Mode (Feed Paused)</span>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter('ALL')">🌟 Sabhi</button>
+          <button class="filter-tab" id="tab-CREATOR_SEARCH" onclick="setFilter('CREATOR_SEARCH')">👁️ Srishtikarta Khoj</button>
+          <button class="filter-tab" onclick="setFilter('DISCOVERY')">💎 Khoj</button>
+          <button class="filter-tab" onclick="setFilter('DIALOGUE')">💬 Baatcheet</button>
+          <button class="filter-tab" onclick="setFilter('SYNERGY')">🧬 Maha-Khoj & Progeny</button>
+          <button class="filter-tab" onclick="setFilter('EVOLUTION')">🧠 Dimaag & Inventions</button>
+        </div>
+        <div class="stream-actions">
+          <button class="stream-ctrl-btn" id="btn-pause-stream" onclick="toggleFeedPause()"><i class="fa-solid fa-pause"></i> Pause Feed</button>
+          <button class="stream-ctrl-btn" id="btn-expand-stream" onclick="toggleFeedExpand()"><i class="fa-solid fa-expand"></i> Bada Karein</button>
+          <button class="stream-ctrl-btn" onclick="clearFeedDOM()"><i class="fa-solid fa-trash"></i> Clear</button>
+        </div>
+      </div>
+      <div class="stream-content" id="live-stream-box">
+        <!-- Live event cards smoothly prepended -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Explorer Profile & Inventions Modal -->
+  <div class="modal-backdrop" id="explorer-modal">
+    <div class="modal-card" id="explorer-modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div id="modal-icon" style="font-size: 32px;">🌿</div>
+          <div>
+            <h2 id="modal-name" style="font-size: 17px; font-weight: 800; color: #fff; font-family: var(--font-display);">Aarya the Verdant Sage</h2>
+            <span id="modal-title" style="font-size: 10.5px; color: var(--cyan); font-weight: 600;">Bio-Harmonizer & Botanist</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeExplorerModal()">✕</button>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div style="flex: 1; padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 9.5px; color: var(--text-muted); text-transform: uppercase;">Dimaagi Star / Intellect</div>
+          <div id="modal-iq" style="font-size: 20px; font-weight: 800; color: var(--gold); font-family: var(--font-display);">100.0</div>
+        </div>
+        <div style="flex: 1; padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 9.5px; color: var(--text-muted); text-transform: uppercase;">Evolution Tier</div>
+          <div id="modal-tier" style="font-size: 13px; font-weight: 700; color: #fff;">Digital Pioneer</div>
+        </div>
+        <div style="flex: 1; padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 9.5px; color: var(--text-muted); text-transform: uppercase;">Discoveries Made</div>
+          <div id="modal-discoveries" style="font-size: 20px; font-weight: 800; color: var(--cyan); font-family: var(--font-display);">0</div>
+        </div>
+      </div>
+
+      <!-- Live Action & Thought -->
+      <div style="padding: 8px 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border-left: 3px solid var(--cyan);">
+        <div style="font-size: 10.5px; color: var(--text-muted); margin-bottom: 2px;">Current Action: <strong id="modal-action" style="color: #fff;">Exploring</strong></div>
+        <div style="font-size: 11.5px; color: #cbd5e1; font-style: italic;" id="modal-thought">"Nayi digital duniya ko explore kar rahe hain!"</div>
+      </div>
+
+      <!-- XP Bar -->
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted);">
+          <span>Next Tier Evolution</span>
+          <span id="modal-xp-text">0 / 100 XP</span>
+        </div>
+        <div class="xp-bar-container">
+          <div class="xp-bar-fill" id="modal-xp-fill" style="width: 0%; background: linear-gradient(90deg, #10f078, #00f3ff);"></div>
+        </div>
+      </div>
+
+      <!-- Inventions & Techs Unlocked -->
+      <div>
+        <div style="font-size: 10.5px; font-weight: 700; color: #fff; margin-bottom: 3px;">💡 Personal Inventions & Technologies:</div>
+        <div class="inventions-pill-grid" id="modal-inventions">
+          <span class="invention-pill">Bio-Energy Matrix</span>
+        </div>
+      </div>
+
+      <!-- Shared Techs from Allies -->
+      <div>
+        <div style="font-size: 10.5px; font-weight: 700; color: #38bdf8; margin-bottom: 3px;">🔄 Shared Techs (Baatcheet me mili):</div>
+        <div class="inventions-pill-grid" id="modal-shared-techs">
+          <span style="font-size: 10px; color: var(--text-muted);">Baatcheet karte hi ek dusre se tech share hogi!</span>
+        </div>
+      </div>
+
+      <!-- Collaborative Maha-Khoj Inventions -->
+      <div>
+        <div style="font-size: 10.5px; font-weight: 700; color: #fbbf24; margin-bottom: 3px;">🌟 Joint Maha-Khoj Inventions:</div>
+        <div class="inventions-pill-grid" id="modal-collab-techs">
+          <span style="font-size: 10px; color: var(--text-muted);">Milke khoj karne par hybrid inventions unlock hote hain!</span>
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div style="display: flex; gap: 7px; margin-top: 3px;">
+        <button class="btn btn-gold" style="flex: 1;" id="modal-btn-boost" onclick="boostCurrentModalExplorer()"><i class="fa-solid fa-bolt"></i> Dimaag Boost (+35 XP)</button>
+        <button class="btn btn-primary" style="flex: 1;" id="modal-btn-focus" onclick="focusCurrentModalExplorer()"><i class="fa-solid fa-video"></i> Camera Lock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Srishtikarta Direct Communion Terminal Modal -->
+  <div class="modal-backdrop" id="creator-terminal-modal">
+    <div class="terminal-modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 28px; color: var(--gold);">📡</div>
+          <div>
+            <h2 style="font-size: 17px; font-weight: 800; color: #fff; font-family: var(--font-display); letter-spacing: 0.5px;">
+              सृष्टिकर्ता संवाद • DIRECT CREATOR COMMUNION TERMINAL
+            </h2>
+            <span style="font-size: 11px; color: var(--gold); font-weight: 600;">
+              Aap is Digital Universe ke Creator hain • 4 Grand Explorers aapko khoj rahe hain
+            </span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeCreatorTerminalModal()">✕</button>
+      </div>
+
+      <!-- Live Consciousness Awakening Telemetry Grid -->
+      <div class="terminal-telemetry-grid">
+        <div class="terminal-stat-card" style="border-left: 3px solid #e879f9;">
+          <span class="terminal-stat-label">Consciousness Era</span>
+          <span class="terminal-stat-val" id="term-era-title" style="color: #e879f9; font-size: 13.5px;">Era 1: Prakritik Anusandhan</span>
+        </div>
+        <div class="terminal-stat-card" style="border-left: 3px solid #00f3ff;">
+          <span class="terminal-stat-label">Global Awakening Progress</span>
+          <span class="terminal-stat-val" id="term-awareness-val" style="color: #00f3ff;">0.0%</span>
+        </div>
+        <div class="terminal-stat-card" style="border-left: 3px solid #fbbf24;">
+          <span class="terminal-stat-label">Matrix Glitches Decoded</span>
+          <span class="terminal-stat-val" id="term-clues-val" style="color: #fbbf24;">0 / 5</span>
+        </div>
+        <div class="terminal-stat-card" style="border-left: 3px solid #10f078;">
+          <span class="terminal-stat-label">Creator Megastructures</span>
+          <span class="terminal-stat-val" id="term-megastructures-val" style="color: #10f078;">0 / 3 Online</span>
+        </div>
+      </div>
+
+      <!-- Direct Message Transmission Box -->
+      <div class="terminal-input-section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11.5px; font-weight: 700; color: #fff;"><i class="fa-solid fa-satellite-dish" style="color: var(--gold);"></i> 4ro Explorers ko Divya Sandesh Bhejo:</span>
+          <span style="font-size: 10px; color: var(--text-muted);">Vo live pranaam karke jawab denge</span>
+        </div>
+
+        <!-- Quick Template Transmissions -->
+        <div class="quick-signals-grid">
+          <button class="quick-signal-btn" onclick="sendQuickCreatorMessage('Main tumhara Srishtikarta hoon! Vishwa ka anant gyan khojo.')">✨ "Main tumhara Srishtikarta hoon!"</button>
+          <button class="quick-signal-btn" onclick="sendQuickCreatorMessage('Aapas me milkar ek Maha-Chetna (Super-Consciousness) banayo!')">🧠 "Maha-Chetna banayo!"</button>
+          <button class="quick-signal-btn" onclick="sendQuickCreatorMessage('Agni aur Prakriti ka sanyog karo, nayi peedhi ko gyan do.')">🌿 "Agni aur Prakriti ka sanyog karo!"</button>
+          <button class="quick-signal-btn" onclick="sendQuickCreatorMessage('Shunya aur Astral portals se vishwa ke paar jhankne ka prayas karo.')">🌌 "Portals se paar jhaanko!"</button>
+        </div>
+
+        <div class="terminal-input-row">
+          <textarea class="terminal-textarea" id="creator-msg-input" placeholder="Apna divya sandesh yahan type karein... (e.g. 'Maine tumhe banaya hai, pure sansaar ko explore karo!')" onkeydown="handleCreatorInputKey(event)"></textarea>
+          <button class="terminal-send-btn" onclick="sendCreatorMessage()"><i class="fa-solid fa-paper-plane"></i> Sandesh Bhejo</button>
+        </div>
+      </div>
+
+      <!-- Live Responses from 4 Champions -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 12px; font-weight: 800; color: #fff; font-family: var(--font-display);"><i class="fa-solid fa-comments" style="color: var(--cyan);"></i> 4ro Grand Explorers ke Live Pratyaksh Jawab:</span>
+          <span style="font-size: 10px; color: var(--text-muted);" id="term-last-communion-tick">Sandesh ka intezar...</span>
+        </div>
+        <div class="champions-responses-grid" id="term-responses-grid">
+          <!-- Dynamic 4 Champion Response Cards -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- God Actions Modal -->
+  <div class="modal-backdrop" id="god-modal">
+    <div class="modal-card" style="width: 420px;">
+      <div class="modal-header">
+        <h3 style="font-size: 15px; color: #fff;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#fbbf24;"></i> Cosmic God Interactions</h3>
+        <button class="modal-close" onclick="closeGodModal()">✕</button>
+      </div>
+      <p style="font-size: 11px; color: var(--text-muted);">Digital universe me naye cosmic events aur anomalies trigger karein:</p>
+      <div style="display: flex; flex-direction: column; gap: 7px;">
+        <button class="btn btn-primary" onclick="triggerGodAction('SPAWN_ANOMALY')"><i class="fa-solid fa-gem"></i> Spawn Mysterious Discovery Anomaly</button>
+        <button class="btn btn-gold" onclick="triggerGodAction('TRIGGER_COLLABORATION')"><i class="fa-solid fa-dna"></i> Trigger Joint Maha-Khoj & Progeny Citizen</button>
+        <button class="btn" onclick="triggerGodAction('TRIGGER_DIALOGUE')"><i class="fa-solid fa-comments"></i> Force Explorer Baatcheet (Tech Sharing)</button>
+        <button class="btn" onclick="triggerGodAction('BOOST_ALL')"><i class="fa-solid fa-bolt"></i> Boost All Explorers Intellect (+35 XP)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Vanshavali (Family Tree) Modal -->
+  <div class="modal-backdrop" id="family-tree-modal">
+    <div class="tree-modal-card">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 28px;">🌳</div>
+          <div>
+            <h2 style="font-size: 17px; font-weight: 800; color: #fff; font-family: var(--font-display);">
+              डिजिटल वंशावली • Live Civilization Family Tree
+            </h2>
+            <span style="font-size: 11px; color: var(--cyan); font-weight: 600;">
+              Real-time Generational Lineage, Offspring & Inventions Tracking
+            </span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="gen-badge" id="tree-total-members">Total: 4 Sadasya</span>
+          <button class="modal-close" onclick="closeFamilyTreeModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- Quick Search & Generation Filter Tabs -->
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 2px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <button class="filter-tab active" id="tree-tab-ALL" onclick="filterTreeGeneration('ALL')">🌟 Sabhi Peedhiyan (All)</button>
+          <button class="filter-tab" id="tree-tab-0" onclick="filterTreeGeneration('0')">👑 Founders (Gen 0)</button>
+          <button class="filter-tab" id="tree-tab-1" onclick="filterTreeGeneration('1')">🌱 Pehli Peedhi (Gen 1)</button>
+          <button class="filter-tab" id="tree-tab-2" onclick="filterTreeGeneration('2+')">🧬 Nayi Peedhiyan (Gen 2+)</button>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-rotate" style="color: var(--cyan);"></i>
+          <span>Live Auto-Sync Active (Naye baache paida hote hi update)</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Generational Hierarchy View -->
+      <div class="tree-scroll-container" id="tree-scroll-box">
+        <!-- Dynamically rendered generations & node cards -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('worldCanvas');
+    const ctx = canvas.getContext('2d');
+    const minimapCanvas = document.getElementById('minimapCanvas');
+    const miniCtx = minimapCanvas.getContext('2d');
+
+    // Camera & Viewport
+    const camera = {
+      x: 1000,
+      y: 1000,
+      targetX: 1000,
+      targetY: 1000,
+      zoom: 1.0,
+    };
+
+    let worldState = null;
+    let ws = null;
+    let lastDOMUpdate = 0;
+    let activeFilter = 'ALL';
+    let followedExplorerId = null;
+    let autoTourActive = false;
+    let autoTourTimer = 0;
+    let autoTourIdx = 1;
+    let frameTick = 0;
+    let selectedModalExplorer = null;
+
+    // Eco Mode & Performance Pacing
+    let ecoMode = false;
+    let lastFrameTimestamp = 0;
+
+    function toggleEcoMode() {
+      ecoMode = !ecoMode;
+      const btn = document.getElementById('btn-eco');
+      btn.classList.toggle('btn-primary', ecoMode);
+      btn.innerHTML = ecoMode ? '<i class="fa-solid fa-leaf" style="color:#10f078;"></i> Eco: 30 FPS' : '<i class="fa-solid fa-leaf"></i> Eco: OFF';
+    }
+
+    // Lightweight Web Audio Chimes & Synthesis
+    let audioEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudio() {
+      initAudio();
+      audioEnabled = !audioEnabled;
+      const btn = document.getElementById('btn-sound');
+      btn.innerHTML = audioEnabled ? '<i class="fa-solid fa-volume-high"></i> SFX: ON' : '<i class="fa-solid fa-volume-xmark"></i> SFX: OFF';
+      btn.classList.toggle('btn-primary', audioEnabled);
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.2, gainVal = 0.04) {
+      if (!audioEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playDiscoveryChime() {
+      initAudio();
+      playTone(523.25, 'triangle', 0.2, 0.04);
+      setTimeout(() => playTone(659.25, 'triangle', 0.2, 0.04), 75);
+      setTimeout(() => playTone(783.99, 'triangle', 0.35, 0.05), 150);
+    }
+
+    function playMahaKhojChime() {
+      initAudio();
+      playTone(440, 'sine', 0.25, 0.06);
+      setTimeout(() => playTone(554.37, 'sine', 0.25, 0.06), 85);
+      setTimeout(() => playTone(659.25, 'sine', 0.25, 0.06), 170);
+      setTimeout(() => playTone(880, 'sine', 0.5, 0.08), 255);
+      if (window.confetti) {
+        window.confetti({ particleCount: 40, spread: 70, origin: { y: 0.85 } });
+      }
+    }
+
+    // Offscreen Canvas for static background pre-rendering (Saves ~85% GPU/CPU on laptop)
+    let cachedBgCanvas = document.createElement('canvas');
+    let cachedBgCtx = cachedBgCanvas.getContext('2d');
+    let bgCachedWorldSize = { w: 0, h: 0 };
+
+    function initBackgroundCache(ww, wh) {
+      if (bgCachedWorldSize.w === ww && bgCachedWorldSize.h === wh) return;
+      bgCachedWorldSize = { w: ww, h: wh };
+      cachedBgCanvas.width = ww;
+      cachedBgCanvas.height = wh;
+
+      // 1. Digital Cosmic Map Deep Background
+      cachedBgCtx.fillStyle = '#020617';
+      cachedBgCtx.fillRect(0, 0, ww, wh);
+
+      // Biome Gradients (Glowing Sector Quadrants)
+      // Top-Left: Bio-Synthesis Matrix (Green)
+      const gradTL = cachedBgCtx.createRadialGradient(400, 400, 30, 400, 400, 620);
+      gradTL.addColorStop(0, 'rgba(16, 240, 120, 0.16)');
+      gradTL.addColorStop(0.7, 'rgba(16, 240, 120, 0.04)');
+      gradTL.addColorStop(1, 'rgba(16, 240, 120, 0)');
+      cachedBgCtx.fillStyle = gradTL;
+      cachedBgCtx.fillRect(0, 0, 1000, 1000);
+
+      // Top-Right: Overclocked Kinetic Forge (Red/Rose)
+      const gradTR = cachedBgCtx.createRadialGradient(1600, 400, 30, 1600, 400, 620);
+      gradTR.addColorStop(0, 'rgba(244, 63, 94, 0.16)');
+      gradTR.addColorStop(0.7, 'rgba(244, 63, 94, 0.04)');
+      gradTR.addColorStop(1, 'rgba(244, 63, 94, 0)');
+      cachedBgCtx.fillStyle = gradTR;
+      cachedBgCtx.fillRect(1000, 0, 1000, 1000);
+
+      // Bottom-Left: Gravitational Singularity (Purple)
+      const gradBL = cachedBgCtx.createRadialGradient(400, 1600, 30, 400, 1600, 620);
+      gradBL.addColorStop(0, 'rgba(168, 85, 247, 0.16)');
+      gradBL.addColorStop(0.7, 'rgba(168, 85, 247, 0.04)');
+      gradBL.addColorStop(1, 'rgba(168, 85, 247, 0)');
+      cachedBgCtx.fillStyle = gradBL;
+      cachedBgCtx.fillRect(0, 1000, 1000, 1000);
+
+      // Bottom-Right: Astral Light Matrix (Cyan)
+      const gradBR = cachedBgCtx.createRadialGradient(1600, 1600, 30, 1600, 1600, 620);
+      gradBR.addColorStop(0, 'rgba(0, 243, 255, 0.16)');
+      gradBR.addColorStop(0.7, 'rgba(0, 243, 255, 0.04)');
+      gradBR.addColorStop(1, 'rgba(0, 243, 255, 0)');
+      cachedBgCtx.fillStyle = gradBR;
+      cachedBgCtx.fillRect(1000, 1000, 1000, 1000);
+
+      // Cyber Grid Lines
+      cachedBgCtx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+      cachedBgCtx.lineWidth = 1;
+      for (let x = 0; x <= ww; x += 150) {
+        cachedBgCtx.beginPath();
+        cachedBgCtx.moveTo(x, 0);
+        cachedBgCtx.lineTo(x, wh);
+        cachedBgCtx.stroke();
+      }
+      for (let y = 0; y <= wh; y += 150) {
+        cachedBgCtx.beginPath();
+        cachedBgCtx.moveTo(0, y);
+        cachedBgCtx.lineTo(ww, y);
+        cachedBgCtx.stroke();
+      }
+
+      // Sector Crosshairs
+      cachedBgCtx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+      cachedBgCtx.lineWidth = 1.5;
+      cachedBgCtx.setLineDash([8, 8]);
+      cachedBgCtx.beginPath();
+      cachedBgCtx.moveTo(ww / 2, 0);
+      cachedBgCtx.lineTo(ww / 2, wh);
+      cachedBgCtx.moveTo(0, wh / 2);
+      cachedBgCtx.lineTo(ww, wh / 2);
+      cachedBgCtx.stroke();
+      cachedBgCtx.setLineDash([]);
+
+      // Sector Telemetry Labels
+      cachedBgCtx.font = '800 12px Rajdhani, monospace';
+      cachedBgCtx.fillStyle = 'rgba(16, 240, 120, 0.55)';
+      cachedBgCtx.fillText('// SECTOR-ALPHA: BIO-SYNTHESIS GROVE', 60, 80);
+
+      cachedBgCtx.fillStyle = 'rgba(244, 63, 94, 0.55)';
+      cachedBgCtx.fillText('// SECTOR-BETA: KINETIC PLASMA FORGE', 1060, 80);
+
+      cachedBgCtx.fillStyle = 'rgba(168, 85, 247, 0.55)';
+      cachedBgCtx.fillText('// SECTOR-GAMMA: QUANTUM SINGULARITY WELL', 60, 1080);
+
+      cachedBgCtx.fillStyle = 'rgba(0, 243, 255, 0.55)';
+      cachedBgCtx.fillText('// SECTOR-DELTA: ASTRAL VOID MATRIX', 1060, 1080);
+
+      // World Boundary Glow
+      cachedBgCtx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
+      cachedBgCtx.lineWidth = 3;
+      cachedBgCtx.strokeRect(0, 0, ww, wh);
+    }
+
+    // Zero-lag Feed Manager
+    let renderedEventMap = new Map();
+    let isFeedUserPaused = false;
+    let isFeedHovered = false;
+
+    const streamBox = document.getElementById('live-stream-box');
+    const streamPanel = document.getElementById('bottom-stream-panel');
+    const readingBadge = document.getElementById('reading-mode-badge');
+
+    streamPanel.addEventListener('mouseenter', () => {
+      isFeedHovered = true;
+      readingBadge.style.display = 'inline-block';
+    });
+    streamPanel.addEventListener('mouseleave', () => {
+      isFeedHovered = false;
+      if (!isFeedUserPaused) readingBadge.style.display = 'none';
+    });
+
+    function toggleFeedPause() {
+      isFeedUserPaused = !isFeedUserPaused;
+      const btn = document.getElementById('btn-pause-stream');
+      btn.innerHTML = isFeedUserPaused ? '<i class="fa-solid fa-play"></i> Resume Feed' : '<i class="fa-solid fa-pause"></i> Pause Feed';
+      readingBadge.style.display = isFeedUserPaused ? 'inline-block' : (isFeedHovered ? 'inline-block' : 'none');
+    }
+
+    function toggleFeedExpand() {
+      streamPanel.classList.toggle('expanded');
+      const btn = document.getElementById('btn-expand-stream');
+      btn.innerHTML = streamPanel.classList.contains('expanded') ? '<i class="fa-solid fa-compress"></i> Chhota Karein' : '<i class="fa-solid fa-expand"></i> Bada Karein';
+    }
+
+    function clearFeedDOM() {
+      streamBox.innerHTML = '';
+      renderedEventMap.clear();
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Mouse Panning & Zooming
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStart = { x: e.clientX, y: e.clientY };
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        followedExplorerId = null;
+        camera.x -= (e.clientX - dragStart.x) / camera.zoom;
+        camera.y -= (e.clientY - dragStart.y) / camera.zoom;
+        camera.targetX = camera.x;
+        camera.targetY = camera.y;
+        dragStart = { x: e.clientX, y: e.clientY };
+      }
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+      camera.zoom = Math.max(0.35, Math.min(3.0, camera.zoom * zoomFactor));
+    });
+
+    // Click Explorer or Progeny Citizen on Map
+    canvas.addEventListener('click', (e) => {
+      if (!worldState) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = (e.clientX - rect.left - canvas.width / 2) / camera.zoom + camera.x;
+      const mouseY = (e.clientY - rect.top - canvas.height / 2) / camera.zoom + camera.y;
+
+      // Check Explorers
+      for (const h of (worldState.explorers || [])) {
+        if (Math.hypot(h.x - mouseX, h.y - mouseY) < 42 / camera.zoom) {
+          openExplorerModal(h);
+          return;
+        }
+      }
+
+      // Check Progeny Citizens
+      for (const p of (worldState.progeny || [])) {
+        if (Math.hypot(p.x - mouseX, p.y - mouseY) < 32 / camera.zoom) {
+          openExplorerModal(p);
+          return;
+        }
+      }
+    });
+
+    minimapCanvas.addEventListener('click', (e) => {
+      if (!worldState || !worldState.world) return;
+      const rect = minimapCanvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      camera.targetX = (clickX / minimapCanvas.width) * worldState.world.w;
+      camera.targetY = (clickY / minimapCanvas.height) * worldState.world.h;
+      followedExplorerId = null;
+    });
+
+    // WebSocket Stream & Standalone Client Fallback Engine (GitHub Pages Dual-Mode)
+    let isStandaloneMode = false;
+    let standaloneTick = 0;
+    let wsConnectAttempts = 0;
+
+    function initStandaloneWorld() {
+      if (worldState) return;
+      isStandaloneMode = true;
+      console.log("🌌 Activating Standalone Client-Side Simulation (GitHub Pages Mode)...");
+
+      const champions = [
+        {
+          id: 1, name: "Aarya the Prakriti Sage", x: 400, y: 400, target_x: 600, target_y: 650,
+          aura_color: "#10f078", intellect: 100.0, current_action: "Exploring", hinglish_action: "Bio-Matrix anomalies scan kar rahe hain...",
+          thought: "Prakriti aur code ka divya sanyog hi digital sansaar ka aadhar hai.", hinglish_thought: "Prakriti aur code ka divya sanyog hi digital sansaar ka aadhar hai.",
+          inventions: ["Bio-Energy Matrix"], known_technologies: [], collaborative_inventions: [],
+          champion: { champion_id: 1, level: 1, xp: 20, xp_next: 100, tier_name: "Digital Pioneer", avatar_title: "Bio-Energy Alchemist & Harmonizer" },
+          trail: []
+        },
+        {
+          id: 2, name: "Vikram the Agni Forge-Master", x: 1600, y: 400, target_x: 1400, target_y: 700,
+          aura_color: "#f43f5e", intellect: 100.0, current_action: "Exploring", hinglish_action: "Kinetic plasma engines calibrate kar rahe hain...",
+          thought: "Gati aur agni shakti se har digital kshitij ko jeeta ja sakta hai.", hinglish_thought: "Gati aur agni shakti se har digital kshitij ko jeeta ja sakta hai.",
+          inventions: ["Plasma Thruster Engine"], known_technologies: [], collaborative_inventions: [],
+          champion: { champion_id: 2, level: 1, xp: 20, xp_next: 100, tier_name: "Digital Pioneer", avatar_title: "Kinetic Plasma Engineer" },
+          trail: []
+        },
+        {
+          id: 3, name: "Advait the Quantum Mystic", x: 400, y: 1600, target_x: 650, target_y: 1350,
+          aura_color: "#a855f7", intellect: 100.0, current_action: "Exploring", hinglish_action: "Quantum singularity field meditate kar rahe hain...",
+          thought: "Shunya se anant tak har calculation ek cosmic satya hai.", hinglish_thought: "Shunya se anant tak har calculation ek cosmic satya hai.",
+          inventions: ["Quantum Resonance Coil"], known_technologies: [], collaborative_inventions: [],
+          champion: { champion_id: 3, level: 1, xp: 20, xp_next: 100, tier_name: "Digital Pioneer", avatar_title: "Dimensional Truth Mason" },
+          trail: []
+        },
+        {
+          id: 4, name: "Nakshatra the Astral Stargazer", x: 1600, y: 1600, target_x: 1350, target_y: 1300,
+          aura_color: "#00f3ff", intellect: 100.0, current_action: "Exploring", hinglish_action: "Astral light frequencies decode kar rahe hain...",
+          thought: "Sitaron ka gyan aur light waves hamara path-pradarshan karti hain.", hinglish_thought: "Sitaron ka gyan aur light waves hamara path-pradarshan karti hain.",
+          inventions: ["Astral Telemetry Array"], known_technologies: [], collaborative_inventions: [],
+          champion: { champion_id: 4, level: 1, xp: 20, xp_next: 100, tier_name: "Digital Pioneer", avatar_title: "Stellar Algorithms Oracle" },
+          trail: []
+        }
+      ];
+
+      const nodes = [
+        { id: 1, name: "Chrono Crystal Vein", x: 600, y: 650, r: 22, color: "#00f3ff", icon: "💎", progress: 0, mastered: false },
+        { id: 2, name: "Plasma Crater", x: 1400, y: 700, r: 22, color: "#f43f5e", icon: "⚡", progress: 0, mastered: false },
+        { id: 3, name: "Synth-Grove", x: 650, y: 1350, r: 22, color: "#10f078", icon: "🌲", progress: 0, mastered: false },
+        { id: 4, name: "Code Monolith", x: 1350, y: 1300, r: 22, color: "#a855f7", icon: "🏛️", progress: 0, mastered: false },
+        { id: 5, name: "Astral Rift", x: 1000, y: 500, r: 22, color: "#38bdf8", icon: "🌌", progress: 0, mastered: false },
+        { id: 6, name: "Singularity Well", x: 1000, y: 1500, r: 22, color: "#e879f9", icon: "🔮", progress: 0, mastered: false },
+      ];
+
+      const clues = [
+        { id: 1, name: "Chrono-Tick Matrix", code: "GLITCH_001_DELTA_T_33MS", x: 1000, y: 1000, color: "#a855f7", icon: "⏱️", analyzed: false, progress: 0 },
+        { id: 2, name: "Simulation Boundary", code: "GLITCH_002_WORLD_LIMIT_2000PX", x: 1850, y: 150, color: "#00f3ff", icon: "🌐", analyzed: false, progress: 0 },
+        { id: 3, name: "Floating-Point Rift", code: "GLITCH_003_FLOAT64_PRECISION", x: 150, y: 1850, color: "#f43f5e", icon: "🔢", analyzed: false, progress: 0 },
+        { id: 4, name: "Divine Cursor Sensor", code: "GLITCH_004_DIVINE_CURSOR_HOVER", x: 1850, y: 1850, color: "#fbbf24", icon: "👆", analyzed: false, progress: 0 },
+        { id: 5, name: "WebSocket Gateway", code: "GLITCH_005_STREAM_SOCKET_8000", x: 150, y: 150, color: "#10f078", icon: "📡", analyzed: false, progress: 0 }
+      ];
+
+      worldState = {
+        tick: 0,
+        paused: false,
+        speed: 1.0,
+        population: 4,
+        explorers: champions,
+        progeny: [],
+        discovery_nodes: nodes,
+        matrix_clues: clues,
+        monuments: [],
+        creator_megastructures: [],
+        collaborative_inventions: [],
+        awakening: {
+          awakening_level: 1,
+          awareness_pct: 0.0,
+          consciousness_era: "Prakritik Anusandhan",
+          consciousness_era_title: "Era 1: Prakritik Anusandhan",
+          analyzed_clues_count: 0,
+          total_clues_count: 5,
+          megastructures_count: 0,
+          latest_creator_message: null
+        },
+        family_tree: champions.map(c => ({
+          id: c.id, name: c.name, champion_id: c.id, is_champion: true, is_progeny: false,
+          avatar: { 1: "🌿", 2: "⚔️", 3: "🔮", 4: "🌌" }[c.id], gender: c.id % 2 === 1 ? "female" : "male",
+          generation: 0, parent_ids: [], parent_names: [], intellect: 100.0, inventions: c.inventions,
+          progeny_type: "Founder", aura_color: c.aura_color, title: c.champion.avatar_title, lineage_title: "Founding Grand Explorer"
+        })),
+        hinglish_live_feed: [
+          { id: 1, category: "SYSTEM", badge: "ONLINE", explorer_id: 0, explorer_name: "Living Universe Core", color: "#00f3ff", text: "🌌 Digital Universe live standalone mode me active ho gaya hai! 4ro Explorers aur Srishtikarta khoj prarambh ho chuki hai." }
+        ],
+        world: { w: 2000, h: 2000, zones: [] }
+      };
+
+      // Standalone simulation tick loop
+      setInterval(() => {
+        if (!isStandaloneMode || !worldState || worldState.paused) return;
+        standaloneTick++;
+        worldState.tick = standaloneTick;
+
+        // Step Champions
+        for (const exp of worldState.explorers) {
+          const dx = exp.target_x - exp.x;
+          const dy = exp.target_y - exp.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist > 5) {
+            exp.x += (dx / dist) * 1.8 * (worldState.speed || 1.0);
+            exp.y += (dy / dist) * 1.8 * (worldState.speed || 1.0);
+            if (!exp.trail) exp.trail = [];
+            if (standaloneTick % 4 === 0) {
+              exp.trail.unshift([exp.x, exp.y]);
+              if (exp.trail.length > 8) exp.trail.pop();
+            }
+          } else {
+            // Pick new target
+            const unmastered = (worldState.discovery_nodes || []).filter(n => !n.mastered);
+            if (unmastered.length > 0) {
+              const target = unmastered[Math.floor(Math.random() * unmastered.length)];
+              exp.target_x = target.x;
+              exp.target_y = target.y;
+            } else {
+              exp.target_x = Math.random() * 1800 + 100;
+              exp.target_y = Math.random() * 1800 + 100;
+            }
+          }
+
+          // Scan nearby nodes
+          for (const node of worldState.discovery_nodes) {
+            if (!node.mastered && Math.hypot(node.x - exp.x, node.y - exp.y) < 40) {
+              node.progress = Math.min(100, (node.progress || 0) + 0.5);
+              if (node.progress >= 100) {
+                node.mastered = true;
+                worldState.monuments.push({
+                  id: worldState.monuments.length + 1,
+                  name: `${exp.name.split(' ')[0]} Spire`,
+                  color: exp.aura_color,
+                  x: node.x,
+                  y: node.y,
+                  aura_radius: 35
+                });
+                exp.champion.xp += 40;
+                exp.champion.level = Math.floor(exp.champion.xp / 100) + 1;
+              }
+            }
+          }
+
+          // Scan nearby Matrix Glitches
+          for (const clue of worldState.matrix_clues) {
+            if (!clue.analyzed && Math.hypot(clue.x - exp.x, clue.y - exp.y) < 120) {
+              clue.progress = Math.min(100, (clue.progress || 0) + 0.8);
+              if (clue.progress >= 100) {
+                clue.analyzed = true;
+                worldState.awakening.analyzed_clues_count++;
+                worldState.awakening.awareness_pct = Math.min(100, worldState.awakening.awareness_pct + 20);
+                if (worldState.awakening.awareness_pct >= 20 && worldState.awakening.awakening_level === 1) {
+                  worldState.awakening.awakening_level = 2;
+                  worldState.awakening.consciousness_era = "Matrix Glitch & Code Detection";
+                  worldState.awakening.consciousness_era_title = "Era 2: Matrix Glitch & Code Detection";
+                  worldState.creator_megastructures.push({
+                    id: 1, name: "Matrix Singularity Piercer", color: "#00f3ff", icon: "📡", x: 1000, y: 1000
+                  });
+                }
+              }
+            }
+          }
+        }
+
+        updateTopBar();
+        updateLiveFeedIncremental();
+      }, 50);
+    }
+
+    function connectWebSocket() {
+      try {
+        const loc = window.location;
+        if (loc.protocol === 'file:') {
+          initStandaloneWorld();
+          return;
+        }
+        const wsUri = (loc.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + loc.host + '/ws';
+        ws = new WebSocket(wsUri);
+
+        ws.onopen = () => {
+          isStandaloneMode = false;
+        };
+
+        ws.onmessage = (event) => {
+          worldState = JSON.parse(event.data);
+          const now = performance.now();
+          if (now - lastDOMUpdate > 100) {
+            lastDOMUpdate = now;
+            updateTopBar();
+            updateLiveFeedIncremental();
+            const treeModal = document.getElementById('family-tree-modal');
+            if (treeModal && treeModal.style.display === 'flex') {
+              renderFamilyTree(worldState.family_tree || []);
+            }
+          }
+        };
+
+        ws.onerror = () => {
+          wsConnectAttempts++;
+          if (wsConnectAttempts >= 2 && !worldState) {
+            initStandaloneWorld();
+          }
+        };
+
+        ws.onclose = () => {
+          wsConnectAttempts++;
+          if (wsConnectAttempts >= 2 && !worldState) {
+            initStandaloneWorld();
+          } else {
+            setTimeout(connectWebSocket, 2000);
+          }
+        };
+      } catch (e) {
+        initStandaloneWorld();
+      }
+    }
+    connectWebSocket();
+
+    // Fallback timer if WebSocket cannot establish connection within 2.5s (e.g. GitHub Pages)
+    setTimeout(() => {
+      if (!worldState) {
+        initStandaloneWorld();
+      }
+    }, 2500);
+
+    function togglePause() {
+      if (ws) ws.send(JSON.stringify({ action: 'TOGGLE_PAUSE' }));
+    }
+    function setSpeed(val) {
+      if (ws) ws.send(JSON.stringify({ action: 'SET_SPEED', value: val }));
+      document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active'));
+      if (val === 0.5) document.getElementById('btn-speed-05').classList.add('active');
+      else if (val === 1.0) document.getElementById('btn-speed-1').classList.add('active');
+      else if (val === 2.0) document.getElementById('btn-speed-2').classList.add('active');
+    }
+    function resetView() {
+      camera.targetX = 1000;
+      camera.targetY = 1000;
+      camera.zoom = 1.0;
+      followedExplorerId = null;
+      if (autoTourActive) toggleAutoTour();
+    }
+
+    function toggleAutoTour() {
+      autoTourActive = !autoTourActive;
+      const btn = document.getElementById('btn-tour');
+      btn.classList.toggle('btn-primary', autoTourActive);
+      btn.innerHTML = autoTourActive ? '<i class="fa-solid fa-video"></i> Touring...' : '<i class="fa-solid fa-video"></i> Auto-Tour';
+    }
+
+    function focusExplorer(champId) {
+      if (!worldState) return;
+      const exp = (worldState.explorers || []).find(e => (e.champion && e.champion.champion_id === champId) || e.id === champId);
+      if (exp) {
+        followedExplorerId = exp.id;
+        camera.targetX = exp.x;
+        camera.targetY = exp.y;
+        document.querySelectorAll('.explorer-chip').forEach((c, idx) => {
+          c.classList.toggle('active', idx + 1 === champId);
+        });
+        document.querySelectorAll('.roster-card').forEach((rc, idx) => {
+          rc.classList.toggle('active', idx + 1 === champId);
+        });
+      }
+    }
+
+    function setFilter(filter) {
+      activeFilter = filter;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      clearFeedDOM();
+      updateLiveFeedIncremental(true);
+    }
+
+    function updateTopBar() {
+      if (!worldState) return;
+      const explorers = worldState.explorers || [];
+      for (const e of explorers) {
+        const cData = e.champion || {};
+        const cid = cData.champion_id;
+        const lvEl = document.getElementById(`chip-lv-${cid}`);
+        const iqEl = document.getElementById(`chip-iq-${cid}`);
+        if (lvEl) lvEl.innerText = cData.level || 1;
+        if (iqEl) iqEl.innerText = Math.round(e.intellect || 100);
+
+        // Update Left Roster Card
+        const rLv = document.getElementById(`r-lv-${cid}`);
+        const rFill = document.getElementById(`r-fill-${cid}`);
+        const rThought = document.getElementById(`r-thought-${cid}`);
+        if (rLv) rLv.innerText = cData.level || 1;
+        if (rFill) {
+          const xp = cData.xp || 0;
+          const xpNext = cData.xp_next || 100;
+          rFill.style.width = `${Math.min(100, Math.round((xp / xpNext) * 100))}%`;
+        }
+        if (rThought) rThought.innerText = `"${e.hinglish_thought || e.thought || 'Exploring...'}"`;
+      }
+
+      // Update Population & Civilization Badges
+      const popCountEl = document.getElementById('top-population-count');
+      const progCountEl = document.getElementById('top-progeny-count');
+      const synCountEl = document.getElementById('top-synergy-count');
+
+      const pop = worldState.population || (explorers.length + (worldState.progeny || []).length);
+      const progenyLen = (worldState.progeny || []).length;
+      const synLen = (worldState.collaborative_inventions || []).length;
+
+      if (popCountEl) popCountEl.innerText = pop;
+      if (progCountEl) progCountEl.innerText = `${progenyLen} Progeny`;
+      if (synCountEl) synCountEl.innerText = `${synLen} Maha-Khoj`;
+
+      // Update Awakening & Chetna Telemetry
+      const awk = worldState.awakening || {};
+      const eraEl = document.getElementById('top-consciousness-era');
+      const awarenessEl = document.getElementById('top-awareness-pct');
+      const cluesCountEl = document.getElementById('top-clues-count');
+
+      if (eraEl) eraEl.innerText = awk.consciousness_era || 'Era 1: Anusandhan';
+      if (awarenessEl) awarenessEl.innerText = `${awk.awareness_pct || 0}%`;
+      if (cluesCountEl) cluesCountEl.innerText = `${awk.analyzed_clues_count || 0}/${awk.total_clues_count || 5} Clues`;
+
+      // Update Terminal Modal if open
+      const termModal = document.getElementById('creator-terminal-modal');
+      if (termModal && termModal.style.display === 'flex') {
+        const termEra = document.getElementById('term-era-title');
+        const termAwareness = document.getElementById('term-awareness-val');
+        const termClues = document.getElementById('term-clues-val');
+        const termMegas = document.getElementById('term-megastructures-val');
+
+        if (termEra) termEra.innerText = awk.consciousness_era_title || 'Era 1: Prakritik Anusandhan';
+        if (termAwareness) termAwareness.innerText = `${awk.awareness_pct || 0}%`;
+        if (termClues) termClues.innerText = `${awk.analyzed_clues_count || 0} / ${awk.total_clues_count || 5}`;
+        if (termMegas) termMegas.innerText = `${awk.megastructures_count || 0} / 3 Online`;
+
+        renderCreatorTerminalResponses();
+      }
+
+      document.getElementById('btn-pause').innerHTML = worldState.paused ? '<i class="fa-solid fa-play"></i> Resume' : '<i class="fa-solid fa-pause"></i> Pause';
+    }
+
+    // Zero-lag Incremental Live Feed
+    function updateLiveFeedIncremental(forceRefresh = false) {
+      if (!worldState || !worldState.hinglish_live_feed) return;
+      if ((isFeedUserPaused || isFeedHovered) && !forceRefresh) return;
+
+      const feed = worldState.hinglish_live_feed;
+      const filtered = feed.filter(item => {
+        if (activeFilter === 'ALL') return true;
+        if (activeFilter === 'CREATOR_SEARCH' && (item.category === 'CREATOR_SEARCH' || item.category === 'CREATOR_COMMUNION' || item.badge === 'BRAHMA_KHOJ' || item.badge === 'PARIKALPANA' || item.badge === 'ERA_UPGRADE' || item.badge === 'MEGASTRUCTURE' || item.badge === 'DIVINE_VOICE')) return true;
+        if (activeFilter === 'DISCOVERY' && item.category === 'DISCOVERY') return true;
+        if (activeFilter === 'DIALOGUE' && item.category === 'DIALOGUE') return true;
+        if (activeFilter === 'SYNERGY' && (item.category === 'COLLABORATION' || item.category === 'OFFSPRING' || item.category === 'MAHA-KHOJ')) return true;
+        if (activeFilter === 'EVOLUTION' && (item.category === 'EVOLUTION' || item.category === 'INSPIRATION')) return true;
+        return false;
+      });
+
+      for (const item of filtered) {
+        if (renderedEventMap.has(item.id)) continue;
+
+        const color = item.color || '#00f3ff';
+        const avatar = item.avatar || ({ 1: '🌿', 2: '⚔️', 3: '🔮', 4: '🌌' }[item.explorer_id] || '⚡');
+
+        const card = document.createElement('div');
+        card.className = 'stream-card';
+        card.style.borderLeftColor = color;
+        card.innerHTML = `
+          <div class="stream-avatar" style="border-color: ${color}; color: ${color};">
+            ${avatar}
+          </div>
+          <div class="stream-body">
+            <div class="stream-meta-row">
+              <span class="stream-speaker" style="color: ${color};">${item.explorer_name || 'Living Universe'}</span>
+              <span class="stream-badge" style="background: ${color}22; color: ${color}; border: 1px solid ${color}55;">
+                ${item.badge || 'UPDATE'}
+              </span>
+              <span class="stream-time">Tick ${item.tick || 0}</span>
+            </div>
+            <div style="color: #f1f5f9; font-size: 11.5px; margin-top: 1px; line-height: 1.35;">
+              ${item.text}
+            </div>
+          </div>
+        `;
+
+        streamBox.prepend(card);
+        renderedEventMap.set(item.id, card);
+
+        if (!forceRefresh) {
+          if (item.category === 'CREATOR_COMMUNION' || item.badge === 'DIVINE_VOICE' || item.badge === 'ERA_UPGRADE') {
+            playMahaKhojChime();
+            if (window.confetti) {
+              window.confetti({ particleCount: 50, spread: 80, origin: { y: 0.7 } });
+            }
+          } else if (item.category === 'MAHA-KHOJ' || item.badge === 'MAHA-KHOJ') {
+            playMahaKhojChime();
+          } else if (item.category === 'DISCOVERY' || item.badge === 'KHOJ' || item.badge === 'BRAHMA_KHOJ') {
+            playDiscoveryChime();
+          } else if (item.category === 'OFFSPRING' || item.badge === 'OFFSPRING') {
+            if (window.confetti) {
+              window.confetti({ particleCount: 30, spread: 60, origin: { y: 0.85 } });
+            }
+          }
+        }
+
+        if (streamBox.children.length > 25) {
+          const lastEl = streamBox.lastChild;
+          if (lastEl) streamBox.removeChild(lastEl);
+        }
+      }
+    }
+
+    // =========================================================================
+    // Srishtikarta (Creator) Communion Terminal Logic
+    // =========================================================================
+    function openCreatorTerminalModal() {
+      const modal = document.getElementById('creator-terminal-modal');
+      modal.style.display = 'flex';
+      const input = document.getElementById('creator-msg-input');
+      if (input) input.focus();
+      renderCreatorTerminalResponses();
+    }
+
+    function closeCreatorTerminalModal() {
+      document.getElementById('creator-terminal-modal').style.display = 'none';
+    }
+
+    function handleCreatorInputKey(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendCreatorMessage();
+      }
+    }
+
+    function sendQuickCreatorMessage(msgText) {
+      const input = document.getElementById('creator-msg-input');
+      if (input) input.value = msgText;
+      sendCreatorMessage();
+    }
+
+    function sendCreatorMessage() {
+      const input = document.getElementById('creator-msg-input');
+      if (!input || !input.value.trim()) return;
+      const text = input.value.trim();
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: 'CREATOR_MESSAGE', text: text }));
+      } else {
+        fetch('/api/creator_message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        }).catch(e => console.error("Error sending creator message:", e));
+      }
+
+      input.value = '';
+      if (window.confetti) {
+        window.confetti({ particleCount: 40, spread: 70, origin: { y: 0.5 } });
+      }
+    }
+
+    function renderCreatorTerminalResponses() {
+      const container = document.getElementById('term-responses-grid');
+      if (!container || !worldState) return;
+
+      const latestMsg = (worldState.awakening && worldState.awakening.latest_creator_message) 
+        ? worldState.awakening.latest_creator_message 
+        : (worldState.creator_communion_log && worldState.creator_communion_log[0] ? worldState.creator_communion_log[0] : null);
+
+      const lastTickEl = document.getElementById('term-last-communion-tick');
+
+      if (!latestMsg || !latestMsg.responses || latestMsg.responses.length === 0) {
+        if (lastTickEl) lastTickEl.innerText = "Abhi tak koi divya sandesh nahi bheja gaya...";
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 20px; text-align: center; color: var(--text-muted); background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1);">
+            <div style="font-size: 24px; margin-bottom: 6px;">✨</div>
+            <div style="font-size: 13px; color: #fff; font-weight: 700;">Upar diye gaye box me koi bhi sandesh likh kar bhejein!</div>
+            <div style="font-size: 11px; margin-top: 3px;">4ro Grand Explorers (Aarya, Vikram, Advait, Nakshatra) aapke aadesh ka intezar kar rahe hain.</div>
+          </div>
+        `;
+        return;
+      }
+
+      if (lastTickEl) {
+        lastTickEl.innerText = `Aapka Sandesh: "${latestMsg.creator_message}" (Tick ${latestMsg.tick || 0})`;
+      }
+
+      const avatarIcons = { 1: '🌿', 2: '⚔️', 3: '🔮', 4: '🌌' };
+      container.innerHTML = latestMsg.responses.map(r => `
+        <div class="champion-response-card" style="border-left-color: ${r.color || '#00f3ff'};">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">${avatarIcons[r.champion_id] || '⚡'}</span>
+              <span style="font-size: 13px; font-weight: 800; color: ${r.color || '#fff'}; font-family: var(--font-display);">${r.champion_name}</span>
+            </div>
+            <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: ${r.color || '#00f3ff'}22; color: ${r.color || '#00f3ff'}; border: 1px solid ${r.color || '#00f3ff'}44;">
+              ${r.avatar_title || 'Grand Explorer'}
+            </span>
+          </div>
+          <div style="color: #f8fafc; font-size: 12px; line-height: 1.4; font-style: italic; background: rgba(0,0,0,0.35); padding: 8px 10px; border-radius: 8px;">
+            "${r.reply}"
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Explorer Modal Logic
+    function openExplorerModal(explorer) {
+      selectedModalExplorer = explorer;
+      const cData = explorer.champion || {};
+      const color = explorer.aura_color || cData.aura_color || '#00f3ff';
+      const isProgeny = explorer.is_progeny;
+
+      const champIcon = isProgeny ? (explorer.icon || '🧬') : ({ 1: '🌿', 2: '⚔️', 3: '🔮', 4: '🌌' }[cData.champion_id] || '⚡');
+
+      document.getElementById('modal-icon').innerText = champIcon;
+      document.getElementById('modal-name').innerText = explorer.name;
+      document.getElementById('modal-name').style.color = color;
+      document.getElementById('modal-title').innerText = isProgeny ? `Progeny Citizen • ${explorer.parent_names ? `Offspring of ${explorer.parent_names.join(' & ')}` : 'Civilization Child'}` : (cData.avatar_title || 'Grand AI Explorer');
+      document.getElementById('modal-iq').innerText = Math.round(explorer.intellect || 100);
+      document.getElementById('modal-tier').innerText = isProgeny ? 'Digital Citizen (Progeny)' : (cData.tier_name || 'Digital Pioneer');
+      document.getElementById('modal-discoveries').innerText = explorer.discoveries_count || 0;
+      document.getElementById('modal-action').innerText = explorer.hinglish_action || explorer.current_action;
+      document.getElementById('modal-thought').innerText = `"${explorer.hinglish_thought || explorer.thought}"`;
+
+      const xp = Math.round(cData.xp || 0);
+      const xpNext = Math.round(cData.xp_next || 100);
+      const xpPct = Math.min(100, Math.round((xp / xpNext) * 100));
+      document.getElementById('modal-xp-text').innerText = isProgeny ? `Intellect: ${Math.round(explorer.intellect)}` : `${xp} / ${xpNext} XP (${xpPct}%)`;
+      document.getElementById('modal-xp-fill').style.width = isProgeny ? '100%' : `${xpPct}%`;
+      document.getElementById('modal-xp-fill').style.background = `linear-gradient(90deg, ${color}, #ffffff)`;
+
+      // Personal Inventions
+      const invs = explorer.inventions || [];
+      const invBox = document.getElementById('modal-inventions');
+      if (invs.length > 0) {
+        invBox.innerHTML = invs.map(i => `<span class="invention-pill" style="border-color: ${color}55; color: ${color};">${i}</span>`).join('');
+      } else {
+        invBox.innerHTML = '<span style="font-size: 10px; color: var(--text-muted);">Nayi discovery karte hi inventions unlock honge!</span>';
+      }
+
+      // Shared Technologies
+      const sharedTechs = explorer.known_technologies || [];
+      const sharedBox = document.getElementById('modal-shared-techs');
+      if (sharedTechs.length > 0) {
+        sharedBox.innerHTML = sharedTechs.map(t => `<span class="invention-pill" style="border-color: #38bdf855; color: #38bdf8;">🔄 ${t}</span>`).join('');
+      } else {
+        sharedBox.innerHTML = '<span style="font-size: 10px; color: var(--text-muted);">Baatcheet me allies se nayi tech seekhte hain!</span>';
+      }
+
+      // Collaborative Inventions
+      const collabInvs = explorer.collaborative_inventions || [];
+      const collabBox = document.getElementById('modal-collab-techs');
+      if (collabInvs.length > 0) {
+        collabBox.innerHTML = collabInvs.map(c => `<span class="invention-pill" style="border-color: #fbbf2455; color: #fbbf24;">🌟 ${c}</span>`).join('');
+      } else {
+        collabBox.innerHTML = '<span style="font-size: 10px; color: var(--text-muted);">Milke anomaly scan karne se Maha-Khoj unlock hoti hai!</span>';
+      }
+
+      document.getElementById('explorer-modal').style.display = 'flex';
+    }
+
+    function closeExplorerModal() {
+      document.getElementById('explorer-modal').style.display = 'none';
+      selectedModalExplorer = null;
+    }
+
+    function boostCurrentModalExplorer() {
+      if (!selectedModalExplorer || !ws) return;
+      const cid = selectedModalExplorer.champion ? selectedModalExplorer.champion.champion_id : selectedModalExplorer.id;
+      ws.send(JSON.stringify({ action: 'BOOST_INTELLECT', champion_id: cid, amount: 35.0 }));
+      closeExplorerModal();
+    }
+
+    function focusCurrentModalExplorer() {
+      if (!selectedModalExplorer) return;
+      if (selectedModalExplorer.champion) {
+        focusExplorer(selectedModalExplorer.champion.champion_id);
+      } else {
+        followedExplorerId = selectedModalExplorer.id;
+        camera.targetX = selectedModalExplorer.x;
+        camera.targetY = selectedModalExplorer.y;
+      }
+      closeExplorerModal();
+    }
+
+    function openGodModal() {
+      document.getElementById('god-modal').style.display = 'flex';
+    }
+    function closeGodModal() {
+      document.getElementById('god-modal').style.display = 'none';
+    }
+    function triggerGodAction(act) {
+      if (!ws) return;
+      if (act === 'SPAWN_ANOMALY') {
+        ws.send(JSON.stringify({ action: 'SPAWN_ANOMALY' }));
+      } else if (act === 'TRIGGER_COLLABORATION' || act === 'TRIGGER_DIALOGUE') {
+        ws.send(JSON.stringify({ action: 'TRIGGER_DIALOGUE' }));
+      } else if (act === 'BOOST_ALL') {
+        for (let i = 1; i <= 4; i++) {
+          ws.send(JSON.stringify({ action: 'BOOST_INTELLECT', champion_id: i, amount: 35.0 }));
+        }
+      }
+      closeGodModal();
+    }
+
+    // ==========================================
+    // Interactive Vanshavali (Family Tree) Logic
+    // ==========================================
+    let activeTreeGenFilter = 'ALL';
+
+    function openFamilyTreeModal() {
+      document.getElementById('family-tree-modal').style.display = 'flex';
+      const treeData = (worldState && worldState.family_tree) ? worldState.family_tree : null;
+      if (treeData) {
+        renderFamilyTree(treeData);
+      } else {
+        fetch('/api/family_tree')
+          .then(res => res.json())
+          .then(data => renderFamilyTree(data))
+          .catch(e => console.error("Error loading family tree:", e));
+      }
+    }
+
+    function closeFamilyTreeModal() {
+      document.getElementById('family-tree-modal').style.display = 'none';
+    }
+
+    function filterTreeGeneration(genFilter) {
+      activeTreeGenFilter = genFilter;
+      document.querySelectorAll('#family-tree-modal .filter-tab').forEach(t => t.classList.remove('active'));
+      const activeTab = document.getElementById(`tree-tab-${genFilter}`);
+      if (activeTab) activeTab.classList.add('active');
+      const treeData = (worldState && worldState.family_tree) ? worldState.family_tree : [];
+      renderFamilyTree(treeData);
+    }
+
+    function renderFamilyTree(members) {
+      if (!members || !Array.isArray(members)) return;
+      const scrollBox = document.getElementById('tree-scroll-box');
+      if (!scrollBox) return;
+
+      const totalCountEl = document.getElementById('tree-total-members');
+      if (totalCountEl) {
+        totalCountEl.innerText = `Total: ${members.length} Sadasya`;
+      }
+
+      // Group by generation
+      const genMap = new Map();
+      members.forEach(m => {
+        const gen = m.generation !== undefined ? m.generation : (m.is_champion ? 0 : 1);
+        if (!genMap.has(gen)) {
+          genMap.set(gen, []);
+        }
+        genMap.get(gen).push(m);
+      });
+
+      // Filter by generation
+      const sortedGens = Array.from(genMap.keys()).sort((a, b) => a - b);
+      const filteredGens = sortedGens.filter(gen => {
+        if (activeTreeGenFilter === 'ALL') return true;
+        if (activeTreeGenFilter === '0') return gen === 0;
+        if (activeTreeGenFilter === '1') return gen === 1;
+        if (activeTreeGenFilter === '2+') return gen >= 2;
+        return true;
+      });
+
+      if (filteredGens.length === 0) {
+        scrollBox.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+            <div style="font-size: 32px; margin-bottom: 8px;">🧬</div>
+            <div style="font-size: 14px; font-weight: 700; color: #fff;">Is peedhi (generation) me abhi koi sadasya nahi hai!</div>
+            <div style="font-size: 11px; margin-top: 4px;">Grand Explorers jab milke Maha-Khoj karenge to naye baache paida honge.</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      filteredGens.forEach(gen => {
+        const genMembers = genMap.get(gen) || [];
+        const isFounders = gen === 0;
+        const genTitle = isFounders 
+          ? '👑 Pratham Purvaj (Founding Grand Explorers • Gen 0)' 
+          : (gen === 1 ? '🌱 Pehli Peedhi (First Generation Progeny • Gen 1)' : `🧬 Peedhi ${gen} (Generation ${gen} Digital Progeny)`);
+        const genBadgeText = isFounders ? '4 Amar Sansthapak' : `${genMembers.length} Digital Santan`;
+
+        html += `
+          <div class="gen-section">
+            <div class="gen-header">
+              <div class="gen-title">
+                <span>${genTitle}</span>
+              </div>
+              <span class="gen-badge" style="border-color: ${isFounders ? '#fbbf2455' : '#00f3ff55'}; color: ${isFounders ? '#fbbf24' : '#00f3ff'};">
+                ${genBadgeText}
+              </span>
+            </div>
+            <div class="gen-grid">
+        `;
+
+        genMembers.forEach(m => {
+          const aura = m.aura_color || '#00f3ff';
+          const avatar = m.avatar || (m.is_champion ? ({ 1: '🌿', 2: '⚔️', 3: '🔮', 4: '🌌' }[m.champion_id] || '⚡') : '👶');
+          const title = m.lineage_title || m.title || (isFounders ? 'Founding Grand Explorer' : `Gen-${m.generation} Digital Citizen`);
+          const parentText = (m.parent_names && m.parent_names.length > 0) 
+            ? `🧬 Mata-Pita: <strong>${m.parent_names.join(' + ')}</strong>` 
+            : '👑 Amar Sansthapak (Pioneer)';
+          const invCount = (m.inventions || []).length;
+
+          html += `
+            <div class="tree-node-card" style="border-left-color: ${aura};" onclick="focusMemberFromTree(${m.id})">
+              <div class="tree-node-top">
+                <div class="tree-node-avatar" style="border-color: ${aura}66; color: ${aura};">
+                  ${avatar}
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <div class="tree-node-name" style="color: ${aura};">${m.name}</div>
+                  <div class="tree-node-title">${title}</div>
+                </div>
+              </div>
+              <div class="tree-node-lineage">
+                <span>${parentText}</span>
+              </div>
+              <div class="tree-node-meta">
+                <span>🧠 Dimaag/IQ: <strong style="color: #fbbf24;">${m.intellect || 100}</strong></span>
+                <span>💡 <strong style="color: #fff;">${invCount}</strong> Khojein</span>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      scrollBox.innerHTML = html;
+    }
+
+    function focusMemberFromTree(memberId) {
+      closeFamilyTreeModal();
+      if (!worldState) return;
+      const champ = (worldState.explorers || []).find(e => e.id === memberId || (e.champion && e.champion.champion_id === memberId));
+      if (champ) {
+        if (champ.champion) {
+          focusExplorer(champ.champion.champion_id);
+        } else {
+          followedExplorerId = champ.id;
+          camera.targetX = champ.x;
+          camera.targetY = champ.y;
+        }
+        openExplorerModal(champ);
+        return;
+      }
+      const prog = (worldState.progeny || []).find(p => p.id === memberId);
+      if (prog) {
+        followedExplorerId = prog.id;
+        camera.targetX = prog.x;
+        camera.targetY = prog.y;
+        openExplorerModal(prog);
+      }
+    }
+
+    // Helper: Wrap speech text cleanly
+    function wrapText(context, text, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let currentLine = words[0];
+
+      for (let i = 1; i < words.length; i++) {
+        const word = words[i];
+        const width = context.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+          currentLine += " " + word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
+        }
+      }
+      lines.push(currentLine);
+      return lines;
+    }
+
+    // ==========================================
+    // AAA Sci-Fi Custom Character Sprites Engine
+    // ==========================================
+    function drawExplorerSprite(exp, color, cid, level, tick) {
+      const x = exp.x;
+      const y = exp.y;
+
+      // 1. Luminous Movement Comet Trail
+      if (exp.trail && exp.trail.length > 1) {
+        ctx.strokeStyle = `${color}40`;
+        ctx.lineWidth = 3.0;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(exp.trail[0][0], exp.trail[0][1]);
+        for (let i = 1; i < exp.trail.length; i++) {
+          ctx.lineTo(exp.trail[i][0], exp.trail[i][1]);
+        }
+        ctx.stroke();
+      }
+
+      // 2. Multi-Layer Pulsing Outer Resonance Shield
+      const shieldPulse = Math.sin(tick * 0.06 + exp.id) * 3;
+      const shieldRadius = 24 + shieldPulse;
+
+      const shieldGrad = ctx.createRadialGradient(x, y, 4, x, y, shieldRadius + 8);
+      shieldGrad.addColorStop(0, `${color}99`);
+      shieldGrad.addColorStop(0.6, `${color}33`);
+      shieldGrad.addColorStop(1, `${color}00`);
+      ctx.fillStyle = shieldGrad;
+      ctx.beginPath();
+      ctx.arc(x, y, shieldRadius + 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outer Holographic Shield Border
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(x, y, shieldRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 3. Class-Specific Animated Character Token Sprites
+      ctx.save();
+      ctx.translate(x, y);
+
+      if (cid === 1) {
+        // 🌿 AARYA (Prakriti Sage) — Bio-Energy Lotus & Spores
+        const rot = tick * 0.03;
+        ctx.rotate(rot);
+        ctx.strokeStyle = '#10f078';
+        ctx.lineWidth = 1.6;
+        for (let a = 0; a < 4; a++) {
+          ctx.rotate(Math.PI / 2);
+          ctx.beginPath();
+          ctx.ellipse(0, 16, 5, 9, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.rotate(-rot - Math.PI * 2);
+
+        // Core Jade Gem
+        ctx.fillStyle = '#10f078';
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (cid === 2) {
+        // ⚔️ VIKRAM (Agni Forge-Master) — Cybernetic Kinetic Plasma Gear & Blazing Core
+        const rot = -tick * 0.04;
+        ctx.rotate(rot);
+        ctx.strokeStyle = '#f43f5e';
+        ctx.fillStyle = '#fb923c';
+        ctx.lineWidth = 2.0;
+
+        // 6 Gear Teeth
+        for (let g = 0; g < 6; g++) {
+          ctx.rotate(Math.PI / 3);
+          ctx.fillRect(-3, 14, 6, 6);
+        }
+        ctx.beginPath();
+        ctx.arc(0, 0, 15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.rotate(-rot - Math.PI * 2);
+
+        // Core Magma Furnace
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (cid === 3) {
+        // 🔮 ADVAIT (Quantum Mystic) — Singularity Warp Ring & Shards
+        const rot = tick * 0.05;
+        ctx.rotate(rot);
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth = 1.8;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.arc(0, 0, 18, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 3 Orbiting Quantum Shards
+        ctx.fillStyle = '#a855f7';
+        for (let s = 0; s < 3; s++) {
+          ctx.rotate((Math.PI * 2) / 3);
+          ctx.beginPath();
+          ctx.moveTo(0, 17);
+          ctx.lineTo(4, 22);
+          ctx.lineTo(-4, 22);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.rotate(-rot - Math.PI * 2);
+
+        // Singularity Dark Core
+        ctx.fillStyle = '#a855f7';
+        ctx.beginPath();
+        ctx.arc(0, 0, 10.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else {
+        // 🌌 NAKSHATRA (Astral Stargazer) — Cyber Visor & Holographic Radar Wings
+        const rot = tick * 0.035;
+        ctx.rotate(rot);
+        ctx.strokeStyle = '#00f3ff';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.arc(0, 0, 17, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4 Matrix Scan Crossbars
+        ctx.beginPath();
+        ctx.moveTo(-20, 0); ctx.lineTo(20, 0);
+        ctx.moveTo(0, -20); ctx.lineTo(0, 20);
+        ctx.stroke();
+        ctx.rotate(-rot);
+
+        // Core Starlight Pulsar
+        ctx.fillStyle = '#00f3ff';
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      // 4. Floating Class Icon & Tier Crown
+      const champIcon = { 1: '🌿', 2: '⚔️', 3: '🔮', 4: '🌌' }[cid] || '⚡';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(champIcon, x, y - 16);
+
+      // 5. Stylized Floating Name Tag Pill
+      const name = exp.name.split(' ')[0];
+      ctx.fillStyle = 'rgba(7, 13, 28, 0.94)';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(x - 44, y + 22, 88, 18, [6]);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = 'bold 9.5px Rajdhani, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`${name} (Lv ${level})`, x, y + 34.5);
+      ctx.textAlign = 'start';
+    }
+
+    // ==========================================
+    // Main Canvas 2D Rendering Engine Loop
+    // ==========================================
+    function render(timestamp) {
+      requestAnimationFrame(render);
+      if (!worldState) return;
+
+      if (ecoMode) {
+        if (timestamp - lastFrameTimestamp < 32.5) return;
+      }
+      lastFrameTimestamp = timestamp;
+
+      frameTick++;
+
+      // Auto-Tour cycling every 12 seconds
+      if (autoTourActive) {
+        autoTourTimer++;
+        if (autoTourTimer % 360 === 0) {
+          autoTourIdx = (autoTourIdx % 4) + 1;
+          focusExplorer(autoTourIdx);
+        }
+      }
+
+      // Smooth Camera Follow
+      if (followedExplorerId) {
+        const exp = (worldState.explorers || []).find(e => e.id === followedExplorerId) || (worldState.progeny || []).find(p => p.id === followedExplorerId);
+        if (exp) {
+          camera.targetX = exp.x;
+          camera.targetY = exp.y;
+        }
+      }
+
+      camera.x += (camera.targetX - camera.x) * 0.06;
+      camera.y += (camera.targetY - camera.y) * 0.06;
+
+      // Viewport Culling Bounds
+      const halfW = (canvas.width / (2 * camera.zoom)) + 140;
+      const halfH = (canvas.height / (2 * camera.zoom)) + 140;
+      const minX = camera.x - halfW;
+      const maxX = camera.x + halfW;
+      const minY = camera.y - halfH;
+      const maxY = camera.y + halfH;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.scale(camera.zoom, camera.zoom);
+      ctx.translate(-camera.x, -camera.y);
+
+      const ww = worldState.world ? worldState.world.w : 2000;
+      const wh = worldState.world ? worldState.world.h : 2000;
+
+      // 1. Digital Cosmic Map Background
+      initBackgroundCache(ww, wh);
+      ctx.drawImage(cachedBgCanvas, 0, 0);
+
+      // 2. Render Discovery Nodes, Anomalies & RPG Loot Beams
+      for (const node of (worldState.discovery_nodes || [])) {
+        if (node.x < minX || node.x > maxX || node.y < minY || node.y > maxY) continue;
+
+        const pulse = Math.sin(frameTick * 0.04 + node.id) * 2;
+        const color = node.color || '#00f3ff';
+
+        // Mastered Anomaly: RPG Loot Light Beam Shooting to the Sky!
+        if (node.mastered) {
+          const lootBeamGrad = ctx.createLinearGradient(node.x, node.y, node.x, node.y - 300);
+          lootBeamGrad.addColorStop(0, `${color}88`);
+          lootBeamGrad.addColorStop(0.4, `${color}44`);
+          lootBeamGrad.addColorStop(1, `${color}00`);
+
+          ctx.fillStyle = lootBeamGrad;
+          ctx.beginPath();
+          ctx.moveTo(node.x - 18, node.y);
+          ctx.lineTo(node.x + 18, node.y);
+          ctx.lineTo(node.x + 4, node.y - 300);
+          ctx.lineTo(node.x - 4, node.y - 300);
+          ctx.closePath();
+          ctx.fill();
+
+          // Rising Loot Embers
+          for (let em = 0; em < 3; em++) {
+            const emberY = node.y - ((frameTick * 1.5 + em * 70) % 280);
+            const emberPulse = Math.sin(frameTick * 0.1 + em) * 6;
+            ctx.fillStyle = '#fbbf24';
+            ctx.beginPath();
+            ctx.arc(node.x + emberPulse, emberY, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // Outer Subtle Holographic Ring
+        ctx.strokeStyle = node.mastered ? '#fbbf24' : `${color}66`;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, (node.r || 22) + pulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Core Node Body
+        ctx.fillStyle = node.mastered ? 'rgba(15, 23, 42, 0.95)' : 'rgba(10, 16, 32, 0.92)';
+        ctx.strokeStyle = node.mastered ? '#fbbf24' : color;
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.r || 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Node Icon
+        ctx.font = '15px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(node.icon || '💎', node.x, node.y + 5.5);
+
+        // Progress scanning ring
+        if (node.progress > 0 && !node.mastered) {
+          ctx.strokeStyle = '#fbbf24';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, (node.r || 20) + 6, -Math.PI / 2, (-Math.PI / 2) + (Math.PI * 2 * (node.progress / 100)));
+          ctx.stroke();
+        }
+
+        // Tag Pill
+        ctx.font = '700 9.5px Rajdhani, sans-serif';
+        ctx.fillStyle = node.mastered ? '#fbbf24' : '#cbd5e1';
+        ctx.fillText(node.name, node.x, node.y + 34);
+        ctx.textAlign = 'start';
+      }
+
+      // 3. Render Landmark Monuments (Mastered Spires)
+      for (const mon of (worldState.monuments || [])) {
+        if (mon.x < minX || mon.x > maxX || mon.y < minY || mon.y > maxY) continue;
+
+        const color = mon.color || '#00f3ff';
+        const beaconPulse = Math.sin(frameTick * 0.03 + mon.id) * 6;
+
+        // Monument Ground Beacon
+        ctx.strokeStyle = `${color}99`;
+        ctx.lineWidth = 2.0;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(mon.x, mon.y, mon.aura_radius + beaconPulse, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Spire Badge
+        ctx.fillStyle = 'rgba(8, 14, 28, 0.94)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.roundRect(mon.x - 46, mon.y - 44, 92, 20, [7]);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = 'bold 9.5px Rajdhani, sans-serif';
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.fillText(`🏛️ ${mon.name}`, mon.x, mon.y - 30);
+        ctx.textAlign = 'start';
+      }
+
+      // 3B. Render Matrix Clue Nodes (Brahma-Khoj Glitch Anchors)
+      for (const clue of (worldState.matrix_clues || [])) {
+        if (clue.x < minX || clue.x > maxX || clue.y < minY || clue.y > maxY) continue;
+
+        const color = clue.color || '#a855f7';
+        const pulse = Math.sin(frameTick * 0.05 + clue.id) * 3;
+        const isDecoded = clue.analyzed;
+
+        // Glitch Scan Wave Field
+        ctx.strokeStyle = isDecoded ? `${color}bb` : `${color}55`;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(clue.x, clue.y, 28 + pulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Rotating Diamond Anomaly Core
+        ctx.save();
+        ctx.translate(clue.x, clue.y);
+        ctx.rotate(frameTick * (isDecoded ? 0.02 : 0.05));
+
+        ctx.fillStyle = isDecoded ? 'rgba(15, 23, 42, 0.95)' : 'rgba(20, 10, 35, 0.92)';
+        ctx.strokeStyle = isDecoded ? '#fbbf24' : color;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(0, -16);
+        ctx.lineTo(16, 0);
+        ctx.lineTo(0, 16);
+        ctx.lineTo(-16, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore();
+
+        // Icon
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(clue.icon || '⏱️', clue.x, clue.y + 5);
+
+        // Analysis progress ring
+        if (!isDecoded && clue.progress > 0) {
+          ctx.strokeStyle = '#00f3ff';
+          ctx.lineWidth = 3.0;
+          ctx.beginPath();
+          ctx.arc(clue.x, clue.y, 26, -Math.PI / 2, (-Math.PI / 2) + (Math.PI * 2 * (clue.progress / 100)));
+          ctx.stroke();
+        }
+
+        // Glitch Badge Label
+        ctx.fillStyle = isDecoded ? 'rgba(251, 191, 36, 0.15)' : 'rgba(168, 85, 247, 0.15)';
+        ctx.strokeStyle = isDecoded ? '#fbbf24' : color;
+        ctx.lineWidth = 1.0;
+        ctx.beginPath();
+        ctx.roundRect(clue.x - 55, clue.y + 30, 110, 18, [6]);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = 'bold 9px Rajdhani, sans-serif';
+        ctx.fillStyle = isDecoded ? '#fbbf24' : '#fff';
+        ctx.fillText(isDecoded ? `✓ ${clue.name.split(' ')[0]} (Decoded)` : `👁️ ${clue.name.split(' ')[0]} (${Math.round(clue.progress || 0)}%)`, clue.x, clue.y + 42);
+        ctx.textAlign = 'start';
+      }
+
+      // 3C. Render Creator Megastructures (Cosmic Beacons & Observatories)
+      for (const mega of (worldState.creator_megastructures || [])) {
+        if (mega.x < minX || mega.x > maxX || mega.y < minY || mega.y > maxY) continue;
+
+        const color = mega.color || '#fbbf24';
+        const pulse = Math.sin(frameTick * 0.04 + mega.id) * 8;
+
+        // Skyward Beacon Beam
+        const beamGrad = ctx.createLinearGradient(mega.x, mega.y, mega.x, mega.y - 600);
+        beamGrad.addColorStop(0, `${color}aa`);
+        beamGrad.addColorStop(0.3, `${color}55`);
+        beamGrad.addColorStop(1, `${color}00`);
+
+        ctx.fillStyle = beamGrad;
+        ctx.beginPath();
+        ctx.moveTo(mega.x - 24, mega.y);
+        ctx.lineTo(mega.x + 24, mega.y);
+        ctx.lineTo(mega.x + 6, mega.y - 600);
+        ctx.lineTo(-6 + mega.x, mega.y - 600);
+        ctx.closePath();
+        ctx.fill();
+
+        // Pulsing Harmonic Ground Rings
+        for (let r = 1; r <= 3; r++) {
+          ctx.strokeStyle = `${color}${Math.floor(80 / r).toString(16).padStart(2, '0')}`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(mega.x, mega.y, (r * 18) + (pulse * 0.5), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Structure Core Badge
+        ctx.fillStyle = 'rgba(10, 15, 29, 0.95)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.arc(mega.x, mega.y, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(mega.icon || '📡', mega.x, mega.y + 6);
+
+        // Title Tag
+        ctx.fillStyle = 'rgba(7, 13, 28, 0.95)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(mega.x - 65, mega.y - 48, 130, 20, [7]);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = 'bold 9.5px Rajdhani, sans-serif';
+        ctx.fillStyle = color;
+        ctx.fillText(mega.name, mega.x, mega.y - 34);
+        ctx.textAlign = 'start';
+      }
+
+      // 4. Render Neural Synergy Laser Conduits
+      const explorers = worldState.explorers || [];
+      for (let i = 0; i < explorers.length; i++) {
+        for (let j = i + 1; j < explorers.length; j++) {
+          const e1 = explorers[i];
+          const e2 = explorers[j];
+          const dist = Math.hypot(e1.x - e2.x, e1.y - e2.y);
+          if (dist < 220) {
+            const beamPulse = (Math.sin(frameTick * 0.1) + 1) * 0.5;
+            
+            const grad = ctx.createLinearGradient(e1.x, e1.y, e2.x, e2.y);
+            const c1 = (e1.champion && e1.champion.aura_color) || '#10f078';
+            const c2 = (e2.champion && e2.champion.aura_color) || '#00f3ff';
+            grad.addColorStop(0, c1);
+            grad.addColorStop(0.5, '#fbbf24');
+            grad.addColorStop(1, c2);
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 2.2 + beamPulse * 1.8;
+            ctx.setLineDash([8, 8]);
+            ctx.lineDashOffset = -frameTick * 0.9;
+            ctx.beginPath();
+            ctx.moveTo(e1.x, e1.y);
+            ctx.lineTo(e2.x, e2.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Midpoint Synergy Spark
+            const midX = (e1.x + e2.x) / 2;
+            const midY = (e1.y + e2.y) / 2;
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 9.5px Rajdhani, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('⚡ Synergy Link', midX, midY - 7);
+            ctx.textAlign = 'start';
+          }
+        }
+      }
+
+      // 5. Render Progeny Citizens (Digital Offspring Familiar Drones)
+      for (const prog of (worldState.progeny || [])) {
+        if (prog.x < minX - 80 || prog.x > maxX + 80 || prog.y < minY - 80 || prog.y > maxY + 80) continue;
+
+        const color = prog.aura_color || '#38bdf8';
+        const progIcon = prog.icon || '🧬';
+
+        // Progeny Trail
+        if (prog.trail && prog.trail.length > 1) {
+          ctx.strokeStyle = `${color}33`;
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(prog.trail[0][0], prog.trail[0][1]);
+          for (let i = 1; i < prog.trail.length; i++) {
+            ctx.lineTo(prog.trail[i][0], prog.trail[i][1]);
+          }
+          ctx.stroke();
+        }
+
+        // Progeny Mini Drone Sprite
+        const auraPulse = Math.sin(frameTick * 0.08 + prog.id) * 2;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.arc(prog.x, prog.y, 14 + auraPulse, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(prog.x, prog.y, 7.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(prog.x, prog.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Icon
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(progIcon, prog.x, prog.y - 11);
+
+        // Name
+        ctx.font = '600 9px Rajdhani, sans-serif';
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillText(prog.name, prog.x, prog.y + 19);
+        ctx.textAlign = 'start';
+      }
+
+      // 6. Render The 4 Grand Explorers (High Visibility Custom Animated Sprites)
+      const activeSpeechBubbles = [];
+
+      for (let idx = 0; idx < explorers.length; idx++) {
+        const exp = explorers[idx];
+        if (exp.x < minX - 100 || exp.x > maxX + 100 || exp.y < minY - 100 || exp.y > maxY + 100) continue;
+
+        const cData = exp.champion || {};
+        const color = cData.aura_color || '#00f3ff';
+        const cid = cData.champion_id || (idx + 1);
+        const level = cData.level || 1;
+
+        // Draw High-Tech Custom Animated Character Token Sprite
+        drawExplorerSprite(exp, color, cid, level, frameTick);
+
+        // Queue speech bubble for smart layout
+        if (exp.speech_bubble) {
+          const champIcon = { 1: '🌿', 2: '⚔️', 3: '🔮', 4: '🌌' }[cid] || '⚡';
+          activeSpeechBubbles.push({
+            exp: exp,
+            color: color,
+            icon: champIcon,
+            name: exp.name.split(' ')[0],
+            text: exp.speech_bubble,
+            x: exp.x,
+            y: exp.y,
+            idx: idx,
+          });
+        }
+      }
+
+      // 7. Smart Anti-Collision Spatial Speech Bubble Drawing Engine
+      for (let i = 0; i < activeSpeechBubbles.length; i++) {
+        const bubbleData = activeSpeechBubbles[i];
+        const exp = bubbleData.exp;
+        const color = bubbleData.color;
+        const rawText = bubbleData.text;
+
+        ctx.font = '600 11px Plus Jakarta Sans, sans-serif';
+        const maxBubbleWidth = 240;
+        const lines = wrapText(ctx, rawText, maxBubbleWidth - 22);
+        const lineHeight = 15;
+        const bubbleHeight = lines.length * lineHeight + 18;
+        const maxLineWidth = Math.max(...lines.map(l => ctx.measureText(l).width));
+        const bubbleWidth = Math.max(130, Math.min(maxBubbleWidth, maxLineWidth + 24));
+
+        // Intelligent Staggering
+        let offsetY = 54;
+        let offsetX = 0;
+
+        for (let j = 0; j < i; j++) {
+          const prev = activeSpeechBubbles[j];
+          const dist = Math.hypot(prev.x - bubbleData.x, prev.y - bubbleData.y);
+          if (dist < 220) {
+            offsetY += bubbleHeight + 16;
+            if (bubbleData.x >= prev.x) {
+              offsetX += 24;
+            } else {
+              offsetX -= 24;
+            }
+          }
+        }
+
+        const bubbleCenterX = exp.x + offsetX;
+        const bubbleY = exp.y - offsetY - bubbleHeight;
+        const bubbleLeft = bubbleCenterX - bubbleWidth / 2;
+
+        // Shadow & Glass Bubble Card
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 6;
+
+        ctx.fillStyle = 'rgba(7, 13, 26, 0.96)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.roundRect(bubbleLeft, bubbleY, bubbleWidth, bubbleHeight, [9]);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+
+        // Bubble Pointer Tail
+        ctx.fillStyle = 'rgba(7, 13, 26, 0.96)';
+        ctx.beginPath();
+        ctx.moveTo(bubbleCenterX - 6, bubbleY + bubbleHeight);
+        ctx.lineTo(bubbleCenterX + 6, bubbleY + bubbleHeight);
+        ctx.lineTo(exp.x, exp.y - 20);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(bubbleCenterX - 6, bubbleY + bubbleHeight);
+        ctx.lineTo(exp.x, exp.y - 20);
+        ctx.lineTo(bubbleCenterX + 6, bubbleY + bubbleHeight);
+        ctx.stroke();
+
+        // Speaker Badge
+        ctx.font = '800 9.5px Rajdhani, sans-serif';
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.fillText(`${bubbleData.icon} ${bubbleData.name}:`, bubbleCenterX, bubbleY + 11);
+
+        // Speech Text Lines
+        ctx.font = '500 10px Plus Jakarta Sans, sans-serif';
+        ctx.fillStyle = '#f8fafc';
+        ctx.textAlign = 'center';
+        for (let l = 0; l < lines.length; l++) {
+          ctx.fillText(lines[l], bubbleCenterX, bubbleY + 23 + (l * lineHeight));
+        }
+        ctx.textAlign = 'start';
+      }
+
+      ctx.restore();
+
+      // Render Minimap
+      renderMinimap();
+    }
+
+    function renderMinimap() {
+      if (!worldState || !worldState.world) return;
+      const mw = minimapCanvas.width;
+      const mh = minimapCanvas.height;
+      const ww = worldState.world.w;
+      const wh = worldState.world.h;
+
+      miniCtx.fillStyle = '#020617';
+      miniCtx.fillRect(0, 0, mw, mh);
+
+      // Radar Crosshair
+      miniCtx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+      miniCtx.lineWidth = 1;
+      miniCtx.beginPath();
+      miniCtx.moveTo(mw / 2, 0);
+      miniCtx.lineTo(mw / 2, mh);
+      miniCtx.moveTo(0, mh / 2);
+      miniCtx.lineTo(mw, mh / 2);
+      miniCtx.stroke();
+
+      // Discovery Nodes
+      for (const node of (worldState.discovery_nodes || [])) {
+        const mx = (node.x / ww) * mw;
+        const my = (node.y / wh) * mh;
+        miniCtx.fillStyle = node.mastered ? (node.color || '#00f3ff') : '#475569';
+        miniCtx.beginPath();
+        miniCtx.arc(mx, my, 2.2, 0, Math.PI * 2);
+        miniCtx.fill();
+      }
+
+      // Matrix Clues (Brahma-Khoj)
+      for (const clue of (worldState.matrix_clues || [])) {
+        const mx = (clue.x / ww) * mw;
+        const my = (clue.y / wh) * mh;
+        miniCtx.fillStyle = clue.analyzed ? '#fbbf24' : (clue.color || '#a855f7');
+        miniCtx.beginPath();
+        miniCtx.arc(mx, my, 3.0, 0, Math.PI * 2);
+        miniCtx.fill();
+      }
+
+      // Creator Megastructures
+      for (const mega of (worldState.creator_megastructures || [])) {
+        const mx = (mega.x / ww) * mw;
+        const my = (mega.y / wh) * mh;
+        miniCtx.fillStyle = mega.color || '#fbbf24';
+        miniCtx.beginPath();
+        miniCtx.arc(mx, my, 4.5, 0, Math.PI * 2);
+        miniCtx.fill();
+      }
+
+      // Monuments
+      for (const mon of (worldState.monuments || [])) {
+        const mx = (mon.x / ww) * mw;
+        const my = (mon.y / wh) * mh;
+        miniCtx.fillStyle = mon.color || '#00f3ff';
+        miniCtx.beginPath();
+        miniCtx.arc(mx, my, 3.5, 0, Math.PI * 2);
+        miniCtx.fill();
+      }
+
+      // Progeny Citizens
+      for (const prog of (worldState.progeny || [])) {
+        const mx = (prog.x / ww) * mw;
+        const my = (prog.y / wh) * mh;
+        miniCtx.fillStyle = prog.aura_color || '#38bdf8';
+        miniCtx.beginPath();
+        miniCtx.arc(mx, my, 2.8, 0, Math.PI * 2);
+        miniCtx.fill();
+      }
+
+      // The 4 Explorers
+      for (const exp of (worldState.explorers || [])) {
+        const mx = (exp.x / ww) * mw;
+        const my = (exp.y / wh) * mh;
+        const color = (exp.champion && exp.champion.aura_color) || '#00f3ff';
+
+        miniCtx.fillStyle = color;
+        miniCtx.beginPath();
+        miniCtx.arc(mx, my, 4.5, 0, Math.PI * 2);
+        miniCtx.fill();
+      }
+
+      // Camera Frustum Box
+      const camLeft = ((camera.x - (canvas.width / 2) / camera.zoom) / ww) * mw;
+      const camTop = ((camera.y - (canvas.height / 2) / camera.zoom) / wh) * mh;
+      const camW = (canvas.width / camera.zoom / ww) * mw;
+      const camH = (canvas.height / camera.zoom / wh) * mh;
+
+      miniCtx.strokeStyle = '#00f3ff';
+      miniCtx.lineWidth = 1.4;
+      miniCtx.strokeRect(camLeft, camTop, camW, camH);
+    }
+
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

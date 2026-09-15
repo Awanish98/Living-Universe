@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "living-universe"
+version = "0.1.0"
+description = "Reusable artificial-life and living-particle simulation engine"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=2.0",
+  "pygame>=2.6",
+  "pydantic>=2.8",
+  "python-dotenv>=1.0",
+  "google-genai>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

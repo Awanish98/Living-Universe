@@ -1,0 +1,15 @@
+{
+  "stage": "alpha",
+  "version": "1.0",
+  "codename": "Genesis",
+  "owner_promotion_required": true,
+  "current_goal": "Alpha 1.0 Genesis completed end-to-end with all 12 roadmap phases",
+  "next_version": "1.1",
+  "history": [
+    {
+      "version": "1.0",
+      "status": "completed",
+      "note": "Fully functional artificial life engine, multi-provider AI, procedural audio synth, sci-fi HUD, and persistence"
+    }
+  ]
+}

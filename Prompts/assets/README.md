@@ -1,0 +1,1 @@
+Put optional UI assets here. The first version should generate most visuals procedurally so the project remains lightweight.
